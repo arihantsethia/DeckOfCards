@@ -3,13 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    tools:context="com.enigma.deckofcards.MainActivity" >
+    tools:context="com.enigma.deckofcards.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/btn_admin"
@@ -24,11 +24,11 @@
             android:id="@+id/list_adminpanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
 
                 <Button
                     android:id="@+id/btn_start"
@@ -51,8 +51,7 @@
                 android:id="@+id/list_players"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:orientation="vertical" >
-            </com.enigma.deckofcards.ui.LinearListLayout>
+                android:orientation="vertical"></com.enigma.deckofcards.ui.LinearListLayout>
 
             <Button
                 android:id="@+id/btn_continue"

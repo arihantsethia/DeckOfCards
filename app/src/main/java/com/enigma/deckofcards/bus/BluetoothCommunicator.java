@@ -7,7 +7,7 @@ public class BluetoothCommunicator {
 
     public String mMessageReceive;
 
-    public BluetoothCommunicator(String messageReceive){
+    public BluetoothCommunicator(String messageReceive) {
         mMessageReceive = messageReceive;
     }
 }

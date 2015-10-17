@@ -21,17 +21,16 @@ import de.greenrobot.event.EventBus;
  */
 public class BluetoothServer implements Runnable {
 
-    private boolean CONTINUE_READ_WRITE = true;
-
-    private UUID mUUID;
     public String mClientAddress;
+    private boolean CONTINUE_READ_WRITE = true;
+    private UUID mUUID;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothServerSocket mServerSocket;
     private BluetoothSocket mSocket;
     private InputStream mInputStream;
     private OutputStreamWriter mOutputStreamWriter;
 
-    public BluetoothServer(BluetoothAdapter bluetoothAdapter, String clientAddress){
+    public BluetoothServer(BluetoothAdapter bluetoothAdapter, String clientAddress) {
         mBluetoothAdapter = bluetoothAdapter;
         mClientAddress = clientAddress;
         mUUID = UUID.fromString("e0917680-d427-11e4-8830-" + mClientAddress.replace(":", ""));
@@ -51,7 +50,7 @@ public class BluetoothServer implements Runnable {
 
             EventBus.getDefault().post(new ServerConnectionSuccess(mClientAddress));
 
-            while(CONTINUE_READ_WRITE) {
+            while (CONTINUE_READ_WRITE) {
                 final StringBuilder sb = new StringBuilder();
                 bytesRead = mInputStream.read(buffer);
                 if (bytesRead != -1) {
@@ -74,7 +73,7 @@ public class BluetoothServer implements Runnable {
 
     public void write(String message) {
         try {
-            if(mOutputStreamWriter != null) {
+            if (mOutputStreamWriter != null) {
                 mOutputStreamWriter.write(message);
                 mOutputStreamWriter.flush();
             }
@@ -83,13 +82,13 @@ public class BluetoothServer implements Runnable {
         }
     }
 
-    public String getClientAddress(){
+    public String getClientAddress() {
         return mClientAddress;
     }
 
-    public void closeConnection(){
-        if(mSocket != null){
-            try{
+    public void closeConnection() {
+        if (mSocket != null) {
+            try {
                 mInputStream.close();
                 mInputStream = null;
                 mOutputStreamWriter.close();
@@ -99,7 +98,8 @@ public class BluetoothServer implements Runnable {
                 mServerSocket.close();
                 mServerSocket = null;
                 CONTINUE_READ_WRITE = false;
-            }catch(Exception e){}
+            } catch (Exception e) {
+            }
             CONTINUE_READ_WRITE = false;
         }
     }

@@ -5,66 +5,65 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.LinearLayout;
 
 public class AdminPanelLayout extends LinearLayout {
 
-	float left = 0.0f;
-	float top = 0.0f;
-	float right = 1000.0f;
-	float bottom = 0;
+    float left = 0.0f;
+    float top = 0.0f;
+    float right = 1000.0f;
+    float bottom = 0;
 
-	RectF mRect = new RectF(left, top, right, bottom);
+    RectF mRect = new RectF(left, top, right, bottom);
 
-	UiContext mUiContext = UiContext.getInstance();
-	
-	int mFullWidth, mFullHeight, mCurrentWidth, mCurrentHeight;
+    UiContext mUiContext = UiContext.getInstance();
 
-	public AdminPanelLayout(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		initialize();
-		// TODO Auto-generated constructor stub
-	}
-	
-	private void initialize(){
-		setCurrentHeight((int) mUiContext.dpToPx(0.0f));
-	}
+    int mFullWidth, mFullHeight, mCurrentWidth, mCurrentHeight;
 
-	public void setClipRectHeight(float height) {
+    public AdminPanelLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initialize();
+        // TODO Auto-generated constructor stub
+    }
 
-		bottom = height;
-		mRect = new RectF(left, top, right, bottom);
-		invalidate();
-	}
+    private void initialize() {
+        setCurrentHeight((int) mUiContext.dpToPx(0.0f));
+    }
 
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-		//		canvas.clipRect(mRect);
-	}
+    public void setClipRectHeight(float height) {
 
-	public void setCurrentHeight(int height) {
-		mCurrentHeight = height;
-	}
+        bottom = height;
+        mRect = new RectF(left, top, right, bottom);
+        invalidate();
+    }
 
-	public int getCurrentHeight() {
-		return mCurrentHeight;
-	}
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        //		canvas.clipRect(mRect);
+    }
 
-	@SuppressLint("DefaultLocale")
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    public int getCurrentHeight() {
+        return mCurrentHeight;
+    }
 
-		// Did one of our children change size?
-		int newHeight = getMeasuredHeight();
-		if (newHeight != mFullHeight) {
-			mFullHeight = newHeight;
-		}
+    public void setCurrentHeight(int height) {
+        mCurrentHeight = height;
+    }
 
-		heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) mCurrentHeight, MeasureSpec.AT_MOST);
-		setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-	}
+    @SuppressLint("DefaultLocale")
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        // Did one of our children change size?
+        int newHeight = getMeasuredHeight();
+        if (newHeight != mFullHeight) {
+            mFullHeight = newHeight;
+        }
+
+        heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) mCurrentHeight, MeasureSpec.AT_MOST);
+        setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
+    }
 
 }

@@ -7,7 +7,7 @@ public class ServerConnectionFail {
 
     public String mClientAdressConnectionFail;
 
-    public ServerConnectionFail(String clientAdressConnectionFail){
+    public ServerConnectionFail(String clientAdressConnectionFail) {
         mClientAdressConnectionFail = clientAdressConnectionFail;
     }
 }

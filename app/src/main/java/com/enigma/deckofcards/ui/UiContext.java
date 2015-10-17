@@ -12,85 +12,83 @@ import android.view.ViewConfiguration;
  * architecture is a variant of Model/View/Controller architecture. So, the
  * postEvent function implemented here plays a critical part in the realization
  * of the architecture.
- * 
+ *
  * @author Arun T A
- * 
  */
 public class UiContext {
-	
 
-	private Context mContext;
-	DisplayMetrics mDisplayMetrics;
 
-	private static UiContext mThis;
+    private static UiContext mThis;
+    DisplayMetrics mDisplayMetrics;
+    private Context mContext;
 
-	private UiContext() {
-	}
+    private UiContext() {
+    }
 
-	public static UiContext getInstance() {
-		if (mThis == null) {
-			mThis = new UiContext();
-		}
-		return mThis;
-	}
+    public static UiContext getInstance() {
+        if (mThis == null) {
+            mThis = new UiContext();
+        }
+        return mThis;
+    }
 
-	public void setContextAndHandler(Context context) {
-		if (null != mContext) {
-			Log.wtf("UiContext", "Changing previously set context");
-		}
+    public void setContextAndHandler(Context context) {
+        if (null != mContext) {
+            Log.wtf("UiContext", "Changing previously set context");
+        }
 
-		mContext = context;
-		Resources mResources = mContext.getResources();
-		mDisplayMetrics = mResources.getDisplayMetrics();
-	}
+        mContext = context;
+        Resources mResources = mContext.getResources();
+        mDisplayMetrics = mResources.getDisplayMetrics();
+    }
 
-	
-	public final Context getAppContext() {
-		return mContext;
-	}
 
-	/**
-	 * Very important function. This function is used to convert device
-	 * independent pixel values to device dependent value. It is critical in all
-	 * UI related calculations.
-	 * 
-	 * @param dp
-	 * @return px
-	 */
+    public final Context getAppContext() {
+        return mContext;
+    }
 
-	public float dpToPx(float dp) {
-		DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
-		if (displayMetrics.widthPixels == 480) {
-			dp = dp * (320.0f / 360.0f);
-		}
+    /**
+     * Very important function. This function is used to convert device
+     * independent pixel values to device dependent value. It is critical in all
+     * UI related calculations.
+     *
+     * @param dp
+     * @return px
+     */
 
-		if (displayMetrics.widthPixels == 768) {
-			dp = dp * (384.0f / 360.0f);
-		}
+    public float dpToPx(float dp) {
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        if (displayMetrics.widthPixels == 480) {
+            dp = dp * (320.0f / 360.0f);
+        }
 
-		if (displayMetrics.density == 3.5f) {
-			dp = dp * (1.1428571429f);
-		}
-		float px = dp * displayMetrics.density;
-		return px;
-	}
+        if (displayMetrics.widthPixels == 768) {
+            dp = dp * (384.0f / 360.0f);
+        }
 
-	public float getDensity() {
-		return mDisplayMetrics.density;
-	}
+        if (displayMetrics.density == 3.5f) {
+            dp = dp * (1.1428571429f);
+        }
+        float px = dp * displayMetrics.density;
+        return px;
+    }
 
-	public float getDisplayHeight(){
-		DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
-		return displayMetrics.heightPixels - (int) dpToPx(25.0f);
-	}
-	
-	public float getDispalyMetrics() {
-		DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
-		return displayMetrics.widthPixels;
-	}
-	
-	public boolean isPermanentMenuPresent(){
-		return ViewConfiguration.get(getAppContext()).hasPermanentMenuKey();
-	}
-	
+    public float getDensity() {
+        return mDisplayMetrics.density;
+    }
+
+    public float getDisplayHeight() {
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        return displayMetrics.heightPixels - (int) dpToPx(25.0f);
+    }
+
+    public float getDispalyMetrics() {
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        return displayMetrics.widthPixels;
+    }
+
+    public boolean isPermanentMenuPresent() {
+        return ViewConfiguration.get(getAppContext()).hasPermanentMenuKey();
+    }
+
 }

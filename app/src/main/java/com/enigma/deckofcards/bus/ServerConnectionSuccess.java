@@ -7,7 +7,7 @@ public class ServerConnectionSuccess {
 
     public String mClientAdressConnected;
 
-    public ServerConnectionSuccess(String clientAdressConnected){
+    public ServerConnectionSuccess(String clientAdressConnected) {
         mClientAdressConnected = clientAdressConnected;
     }
 }

@@ -24,10 +24,10 @@ public class BluetoothConnector {
 
 
     /**
-     * @param device         the device
-     * @param secure         if connection should be done via a secure socket
-     * @param adapter        the Android BT adapter
-     * @param uuid a list of UUIDs. if null or empty, the Serial PP id is used
+     * @param device  the device
+     * @param secure  if connection should be done via a secure socket
+     * @param adapter the Android BT adapter
+     * @param uuid    a list of UUIDs. if null or empty, the Serial PP id is used
      */
     public BluetoothConnector(BluetoothDevice device, boolean secure, BluetoothAdapter adapter,
                               UUID uuid) {
@@ -170,6 +170,19 @@ public class BluetoothConnector {
 
     }
 
+    public static class FallbackException extends Exception {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
+        public FallbackException(Exception e) {
+            super(e);
+        }
+
+    }
+
     public class FallbackBluetoothSocket extends NativeBluetoothSocket {
 
         private BluetoothSocket fallbackSocket;
@@ -207,19 +220,6 @@ public class BluetoothConnector {
         @Override
         public void close() throws IOException {
             fallbackSocket.close();
-        }
-
-    }
-
-    public static class FallbackException extends Exception {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
-
-        public FallbackException(Exception e) {
-            super(e);
         }
 
     }

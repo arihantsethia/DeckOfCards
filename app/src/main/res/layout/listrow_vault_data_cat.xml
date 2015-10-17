@@ -6,10 +6,10 @@
     android:background="@color/offwhite"
     tools:ignore="HardcodedText">
 
-    <TextView 
+    <TextView
         android:id="@+id/text_playername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Player Name"/>
+        android:text="Player Name" />
 </RelativeLayout>

@@ -47,7 +47,7 @@ public class BluetoothClient implements Runnable {
 //        List<UUID> uuidCandidates = new ArrayList<UUID>();
 //        uuidCandidates.add(mUuid);
 
-        while(mInputStream == null){
+        while (mInputStream == null) {
             mBluetoothConnector = new BluetoothConnector(mBluetoothDevice, true, mBluetoothAdapter, mUuid);
 
             try {
@@ -89,7 +89,7 @@ public class BluetoothClient implements Runnable {
                     sb.append(result);
                 }
 
-                 EventBus.getDefault().post(new BluetoothCommunicator(sb.toString()));
+                EventBus.getDefault().post(new BluetoothCommunicator(sb.toString()));
 
             }
         } catch (IOException e) {

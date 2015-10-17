@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 
 import butterknife.ButterKnife;
-import enigma.deckofcards.R;
+import com.enigma.deckofcards.R;
 
 /**
  * Created by sethiaa on 17/10/15.

@@ -30,8 +30,8 @@ public abstract class BluetoothActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(!EventBus.getDefault().isRegistered(this))
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
         mBluetoothManager.setNbrClientMax(myNbrClientMax());
     }
 
@@ -54,125 +54,133 @@ public abstract class BluetoothActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isRelevantDevice(BluetoothDevice device){
+    private boolean isRelevantDevice(BluetoothDevice device) {
         return !device.getName().isEmpty() && device.getName().startsWith(getGameName());
     }
 
-    private void setGameName(String gameName){
-        mGameName = gameName;
-    }
-
-    private String getGameName(){
+    private String getGameName() {
         return mGameName;
     }
 
-    public void closeAllConnexion(){
+    private void setGameName(String gameName) {
+        mGameName = gameName;
+    }
+
+    public void closeAllConnexion() {
         mBluetoothManager.closeAllConnexion();
     }
 
-    public void checkBluetoothAviability(){
-        if(!mBluetoothManager.checkBluetoothAviability()){
+    public void checkBluetoothAviability() {
+        if (!mBluetoothManager.checkBluetoothAviability()) {
             onBluetoothNotAvailable();
         }
     }
 
-    public void setTimeDiscoverable(int timeInSec){
+    public void setTimeDiscoverable(int timeInSec) {
         mBluetoothManager.setTimeDiscoverable(timeInSec);
     }
 
-    public void startDiscovery(){
+    public void startDiscovery() {
         mBluetoothManager.startDiscovery();
     }
 
-    public void scanAllBluetoothDevice(){
+    public void scanAllBluetoothDevice() {
         mBluetoothManager.scanAllBluetoothDevice();
     }
 
-    public void disconnectClient(){
+    public void disconnectClient() {
         mBluetoothManager.disconnectClient();
     }
 
-    public void disconnectServer(){
+    public void disconnectServer() {
         mBluetoothManager.disconnectServer();
     }
 
-    public void createServer(String address){
+    public void createServer(String address) {
         mBluetoothManager.createServeur(address);
     }
 
-    public void selectServerMode(){
+    public void selectServerMode() {
         mBluetoothManager.selectServerMode();
     }
-    public void selectClientMode(){
+
+    public void selectClientMode() {
         mBluetoothManager.selectClientMode();
     }
 
-    public BluetoothManager.TypeBluetooth getTypeBluetooth(){
+    public BluetoothManager.TypeBluetooth getTypeBluetooth() {
         return mBluetoothManager.mType;
     }
 
-    public BluetoothManager.TypeBluetooth getBluetoothMode(){
+    public BluetoothManager.TypeBluetooth getBluetoothMode() {
         return mBluetoothManager.mType;
     }
 
-    public void createClient(String addressMac){
+    public void createClient(String addressMac) {
         mBluetoothManager.createClient(addressMac);
     }
 
-    public void sendMessage(String message){
+    public void sendMessage(String message) {
         mBluetoothManager.sendMessage(message);
     }
 
-    public boolean isConnected(){
+    public boolean isConnected() {
         return mBluetoothManager.isConnected;
     }
 
-    public int myNbrClientMax(){
+    public int myNbrClientMax() {
         return 7;
     }
 
     public abstract void onBluetoothDeviceFound(BluetoothDevice device);
+
     public abstract void onClientConnectionSuccess();
+
     public abstract void onClientConnectionFail();
+
     public abstract void onServerConnectionSuccess();
+
     public abstract void onServerConnectionFail();
+
     public abstract void onBluetoothStartDiscovery();
+
     public abstract void onBluetoothCommunicator(String messageReceive);
+
     public abstract void onBluetoothNotAvailable();
 
-    public void onEventMainThread(BluetoothDevice device){
+    public void onEventMainThread(BluetoothDevice device) {
         onBluetoothDeviceFound(device);
-        if(isRelevantDevice(device)){
+        if (isRelevantDevice(device)) {
             createServer(device.getAddress());
         }
     }
 
-    public void onEventMainThread(ClientConnectionSuccess event){
+    public void onEventMainThread(ClientConnectionSuccess event) {
         mBluetoothManager.isConnected = true;
         onClientConnectionSuccess();
     }
 
-    public void onEventMainThread(ClientConnectionFail event){
+    public void onEventMainThread(ClientConnectionFail event) {
         mBluetoothManager.isConnected = false;
         onClientConnectionFail();
     }
 
-    public void onEventMainThread(ServerConnectionSuccess event){
+    public void onEventMainThread(ServerConnectionSuccess event) {
         mBluetoothManager.isConnected = true;
         mBluetoothManager.onServerConnectionSuccess(event.mClientAdressConnected);
         onServerConnectionSuccess();
     }
 
-    public void onEventMainThread(ServerConnectionFail event){
+    public void onEventMainThread(ServerConnectionFail event) {
         mBluetoothManager.onServerConnectionFailed(event.mClientAdressConnectionFail);
         onServerConnectionFail();
     }
 
-    public void onEventMainThread(BluetoothCommunicator event){
+    public void onEventMainThread(BluetoothCommunicator event) {
         onBluetoothCommunicator(event.mMessageReceive);
     }
 
-    public void onEventMainThread(BondedDevice event){
+    public void onEventMainThread(BondedDevice event) {
         //mBluetoothManager.sendMessage("BondedDevice");
     }
 
