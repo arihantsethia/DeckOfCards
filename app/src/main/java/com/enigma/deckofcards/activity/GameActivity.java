@@ -446,7 +446,7 @@ public class GameActivity extends BluetoothActivity {
             collectionPlayers.put(player, 0);
         }
     }
-    
+
     private void giveCards(Button btn) {
         if (gameStarted) {
             return;

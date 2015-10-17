@@ -11,21 +11,50 @@ public class Player implements Parcelable {
     String playerDeviceName;
     String playerAddress;
     int identifier;
+    int playerScore;
+    float totalAmountWon;
+    int amountInPlay;
 
     public Player(String playerDeviceName, String playerAddress, int identifier) {
         this.playerDeviceName = playerDeviceName;
         this.playerAddress = playerAddress;
         this.identifier = identifier;
+        this.playerScore = 0;
+        this.totalAmountWon = 0;
+        this.amountInPlay = 0;
     }
 
     protected Player(Parcel in) {
         playerDeviceName = in.readString();
         playerAddress = in.readString();
         identifier = in.readInt();
+        playerScore = in.readInt();
+        totalAmountWon = in.readFloat();
+        amountInPlay = in.readInt();
     }
 
     public int getIdentifier(){
         return identifier;
+    }
+
+    public int getPlayerScore(){
+        return playerScore;
+    }
+
+    public float getTotalAmountWon(){
+        return totalAmountWon;
+    }
+
+    public void setAmountInPlay(int amount){
+        this.amountInPlay = amount;
+    }
+
+    public void updateAmountWon(float multiplier){
+        totalAmountWon = totalAmountWon + multiplier*amountInPlay;
+    }
+
+    public void updateScore(int change){
+        playerScore =  playerScore + change;
     }
 
     public String getPlayerDeviceName(){
@@ -54,6 +83,9 @@ public class Player implements Parcelable {
         dest.writeString(playerDeviceName);
         dest.writeString(playerAddress);
         dest.writeInt(identifier);
+        dest.writeInt(playerScore);
+        dest.writeFloat(totalAmountWon);
+        dest.writeInt(amountInPlay);
     }
 
     @SuppressWarnings("unused")
