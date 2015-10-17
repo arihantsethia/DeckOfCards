@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -14,6 +15,10 @@ import android.widget.Toast;
 
 import com.enigma.deckofcards.Constant;
 import com.enigma.deckofcards.R;
+import com.enigma.deckofcards.gameclass.Card;
+import com.enigma.deckofcards.gameclass.CardColor;
+import com.enigma.deckofcards.gameclass.CardValue;
+import com.enigma.deckofcards.gameclass.Game;
 import com.enigma.deckofcards.ui.UiContext;
 
 import java.util.ArrayList;
@@ -29,7 +34,7 @@ public class GameActivity extends Activity {
 
     int totalNoOfCards = 52;
     int noOfCardsPerPlayer = 0;
-
+    Game gameState;
     boolean gameStarted = false;
 
     Context mAppContext;
@@ -86,8 +91,11 @@ public class GameActivity extends Activity {
         ButterKnife.inject(this);
 
         if (intent != null) {
-
-            selectedPlayerList = intent.getStringArrayListExtra("PLAYERS");
+            selectedPlayerList = new ArrayList<String>();
+            selectedPlayerList.add(0, "P1");
+            selectedPlayerList.add(0, "P2");
+            // selectedPlayerList = intent.getStringArrayListExtra("PLAYERS");
+            gameState = new Game(selectedPlayerList.size(), 0, true);
             for (int i = 0; i < selectedPlayerList.size(); i++) {
                 Button player = new Button(this);
                 player.setText(selectedPlayerList.get(i));
@@ -119,6 +127,7 @@ public class GameActivity extends Activity {
             String text = selectedPlayerList.get(tag) + " (" + noOfCardsPerPlayer + ")";
             btn.setText(text);
         }
+        gameState.Distribute();
     }
 
     @OnClick(R.id.show_cards)
@@ -150,6 +159,27 @@ public class GameActivity extends Activity {
         moveTrash.setVisibility(View.VISIBLE);
         placeCard.setVisibility(View.VISIBLE);
 
+        ArrayList<Card> cardsOfCurrentPlayer = gameState.getDeck().GetCardForPlayer(0);
+        for (int i = 0; i < cardsOfCurrentPlayer.size(); i++) {
+            Card currentCard = cardsOfCurrentPlayer.get(i);
+            ImageView card = new ImageView(getApplicationContext());
+            String cardName = getCardName(currentCard.getColor(), currentCard.getValue());
+            card.setImageResource(getNextCardImage(cardName));
+            card.setTag(cardName);
+            Log.e("CardName", cardName);
+            if (card != null) {
+                card.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        v.setTranslationY(-mUiCtxt.dpToPx(10.0f));
+                        selectCard((ImageView) v);
+                    }
+                });
+            }
+            cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+        }
+        /*
         for (int i = 0; i < noOfCardsPerPlayer; i++) {
             ImageView card = new ImageView(getApplicationContext());
             String cardName = getNextCard();
@@ -166,7 +196,7 @@ public class GameActivity extends Activity {
                 });
             }
             cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
-        }
+        }*/
     }
 
     @OnClick(R.id.place_card)
@@ -202,7 +232,11 @@ public class GameActivity extends Activity {
             tempCardsImageNames.add(el);
         }
     }
-
+    private static final String[] cardColors = {"DIAMONDS", "HEARTS", "SPADES", "CLUBS"};
+    private static final String[] cardValues = {"ACE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "JACK", "KING", "QUEEN"};
+    private String getCardName(CardColor cardColor, CardValue cardValue) {
+        return cardValues[cardValue.ordinal()] + "_OF_" + cardColors[cardColor.ordinal()];
+    }
     private String getNextCard() {
         Random rnd = new Random();
         int index = rnd.nextInt(tempCardsImageNames.size());

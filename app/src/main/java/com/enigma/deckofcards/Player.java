@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 public class Player {
     BluetoothDevice playerDevice;
     Role role;
+    int index;
 
     public Player(BluetoothDevice playerDevice, Role role) {
         this.playerDevice = playerDevice;
@@ -32,5 +33,13 @@ public class Player {
 
     public Role getRole() {
         return role;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }
