@@ -87,7 +87,7 @@ public class PlayerListAdapter {
         View v = inflater.inflate(R.layout.listrow_vault_data_cat, parent, false);
         playerName = (TextView) v.findViewById(R.id.text_playername);
         if (playerName != null) {
-            playerName.setText(playerList.get(position).toString());
+            playerName.setText(playerList.get(position).getPlayerName());
         }
         v.setOnClickListener(new OnClickListener() {
 
@@ -96,7 +96,7 @@ public class PlayerListAdapter {
                 if (((String) v.getTag()).equalsIgnoreCase("NOTSELECTED")) {
                     v.setTag(new String("SELECTED"));
                     v.setBackgroundColor(Color.argb(255, 236, 234, 104));
-                    ((PlayerListSelectionListener)mActivity).onPerformPlayerDeselect(playerList.get(position));
+                    ((PlayerListSelectionListener)mActivity).onPerformPlayerSelect(playerList.get(position));
                 } else {
                     v.setTag(new String("NOTSELECTED"));
                     v.setBackgroundColor(Color.argb(255, 241, 241, 241));

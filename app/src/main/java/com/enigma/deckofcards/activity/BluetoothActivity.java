@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.enigma.deckofcards.Constant;
+import com.enigma.deckofcards.Role;
 import com.enigma.deckofcards.bluetooth.mananger.BluetoothManager;
 import com.enigma.deckofcards.bus.BluetoothCommunicator;
 import com.enigma.deckofcards.bus.BondedDevice;
@@ -38,6 +40,8 @@ public abstract class BluetoothActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        disconnectClient();
+        disconnectServer();
         closeAllConnexion();
     }
 
@@ -57,10 +61,15 @@ public abstract class BluetoothActivity extends AppCompatActivity {
         return (device.getName() != null) && (device.getName().startsWith(mBluetoothManager.getGameName()));
     }
 
+    protected boolean isAdmin(BluetoothDevice device){
+        return (device.getName() != null) && (device.getName().contains(Role.ADMIN.name()));
+    }
 
-    protected void updateBluetoothAdapterName(String gameName, String playerName) {
+
+    protected void updateBluetoothAdapterName(String gameName, String playerName, Role role) {
         mBluetoothManager.setGameName(gameName);
         mBluetoothManager.setPlayerName(playerName);
+        mBluetoothManager.setRole(role);
         mBluetoothManager.updateName();
     }
 

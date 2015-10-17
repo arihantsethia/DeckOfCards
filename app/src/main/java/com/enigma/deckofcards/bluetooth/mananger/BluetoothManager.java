@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import com.enigma.deckofcards.Role;
 import com.enigma.deckofcards.bluetooth.client.BluetoothClient;
 import com.enigma.deckofcards.bluetooth.server.BluetoothServer;
 import com.enigma.deckofcards.bus.BondedDevice;
@@ -48,8 +49,9 @@ public class BluetoothManager extends BroadcastReceiver {
     private int mTimeDiscoverable;
     private boolean mBluetoothIsEnableOnStart;
     private String mBluetoothNameSaved;
-    private String gameName;
-    private String playerName;
+    private String mGameName;
+    private String mPlayerName;
+    private Role mRole;
 
     public BluetoothManager(Activity activity) {
         mActivity = activity;
@@ -69,19 +71,20 @@ public class BluetoothManager extends BroadcastReceiver {
     public void selectServerMode() {
         startDiscovery();
         mType = TypeBluetooth.Server;
-        updateName();
     }
 
     public void selectClientMode() {
         startDiscovery();
         mType = TypeBluetooth.Client;
-        updateName();
     }
 
     public void updateName(){
-        mBluetoothAdapter.setName(getGameName() + " : " + getPlayerName());
+        mBluetoothAdapter.setName(getGameName() + " : " + getPlayerName() + " : " + getRole());
     }
 
+    public String getDeviceName(){
+        return mBluetoothAdapter.getName();
+    }
 
     public String getYourBtMacAddress() {
         if (mBluetoothAdapter != null) {
@@ -261,6 +264,7 @@ public class BluetoothManager extends BroadcastReceiver {
         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         if (intent.getAction().equals(BluetoothDevice.ACTION_FOUND)) {
             EventBus.getDefault().post(device);
+            Log.d("DeckOfCards",device.getName() + " : " + device.getAddress() + " : "+ device.getBondState());
             /*if ((mType == TypeBluetooth.Client && !isConnected)
                     || (mType == TypeBluetooth.Server && !mAddressListServerWaitingConnection.contains(device.getAddress()))) {
 
@@ -332,19 +336,27 @@ public class BluetoothManager extends BroadcastReceiver {
     }
 
     public String getPlayerName() {
-        return playerName;
+        return mPlayerName;
     }
 
     public void setPlayerName(String playerName) {
-        this.playerName = playerName;
+        mPlayerName = playerName;
     }
 
     public String getGameName() {
-        return gameName;
+        return mGameName;
     }
 
     public void setGameName(String gameName) {
-        this.gameName = gameName;
+        mGameName = gameName;
+    }
+
+    public Role getRole() {
+        return mRole;
+    }
+
+    public void setRole(Role role) {
+        this.mRole = role;
     }
 
     public enum TypeBluetooth {

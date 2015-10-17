@@ -52,14 +52,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:orientation="vertical"></com.enigma.deckofcards.ui.LinearListLayout>
-
-            <Button
-                android:id="@+id/btn_continue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:background="@color/green"
-                android:text="CONTINUE" />
         </com.enigma.deckofcards.ui.AdminPanelLayout>
 
         <Button
@@ -70,6 +62,15 @@
             android:layout_marginTop="10dp"
             android:background="@color/blue"
             android:text="Player" />
+
+        <Button
+            android:id="@+id/btn_continue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/green"
+            android:enabled="false"
+            android:text="CONTINUE" />
     </LinearLayout>
 
 </RelativeLayout>

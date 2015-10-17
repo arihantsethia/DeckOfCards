@@ -1,9 +1,11 @@
 package com.enigma.deckofcards.activity;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -13,19 +15,28 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.enigma.deckofcards.Constant;
+import com.enigma.deckofcards.MessageGenerator;
+import com.enigma.deckofcards.MessageType;
+import com.enigma.deckofcards.Player;
 import com.enigma.deckofcards.R;
+import com.enigma.deckofcards.Role;
 import com.enigma.deckofcards.ui.UiContext;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class GameActivity extends Activity {
+public class GameActivity extends BluetoothActivity {
 
     int totalNoOfCards = 52;
     int noOfCardsPerPlayer = 0;
@@ -34,6 +45,12 @@ public class GameActivity extends Activity {
 
     Context mAppContext;
     UiContext mUiCtxt;
+    Role role;
+    Player admin;
+    ArrayList<Player> selectedPlayerList;
+    String gameUBID = null;
+    int lastHandledMessage = -1;
+
 
     @InjectView(R.id.distribute)
     Button distribute;
@@ -64,8 +81,6 @@ public class GameActivity extends Activity {
 
     ArrayList<String> tempCardsImageNames;
 
-    ArrayList<String> selectedPlayerList;
-
     HashMap<Button, Integer> collectionPlayers = new HashMap<Button, Integer>();
     ArrayList<String> selectedCardValue = new ArrayList<String>();
     ArrayList<String> selectedCardColor = new ArrayList<String>();
@@ -86,23 +101,15 @@ public class GameActivity extends Activity {
         ButterKnife.inject(this);
 
         if (intent != null) {
-
-            selectedPlayerList = intent.getStringArrayListExtra("PLAYERS");
-            for (int i = 0; i < selectedPlayerList.size(); i++) {
-                Button player = new Button(this);
-                player.setText(selectedPlayerList.get(i));
-                player.setTag(i);
-                if (player != null) {
-                    player.setOnClickListener(new OnClickListener() {
-
-                        @Override
-                        public void onClick(View v) {
-                            giveCards((Button) v);
-                        }
-                    });
-                }
-                playerPanel.addView(player);
-                collectionPlayers.put(player, 0);
+            role = (Role) intent.getSerializableExtra("ROLE");
+            if(role == Role.ADMIN){
+                gameUBID = UUID.randomUUID().toString();
+                selectedPlayerList = intent.getParcelableArrayListExtra("PLAYERS");
+                connectToClients();
+                createPlayerButtons();
+            }else{
+                admin = intent.getParcelableExtra("ADMIN");
+                connectToServer();
             }
         }
     }
@@ -150,6 +157,8 @@ public class GameActivity extends Activity {
         moveTrash.setVisibility(View.VISIBLE);
         placeCard.setVisibility(View.VISIBLE);
 
+
+
         for (int i = 0; i < noOfCardsPerPlayer; i++) {
             ImageView card = new ImageView(getApplicationContext());
             String cardName = getNextCard();
@@ -180,9 +189,25 @@ public class GameActivity extends Activity {
             cardPanel.removeView(v);
         }
         selectedCardImages.clear();
-
     }
 
+    private void createPlayerButtons(){
+        for (int i = 0; i < selectedPlayerList.size(); i++) {
+            Button player = new Button(this);
+            player.setText(selectedPlayerList.get(i).getPlayerName());
+            player.setTag(i);
+            if (player != null) {
+                player.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        giveCards((Button) v);
+                    }
+                });
+            }
+            playerPanel.addView(player);
+            collectionPlayers.put(player, 0);
+        }
+    }
     private void giveCards(Button btn) {
         if (gameStarted) {
             return;
@@ -229,6 +254,90 @@ public class GameActivity extends Activity {
     }
 
     private void distributeCards() {
+
+    }
+
+    private void connectToClients(){
+        selectServerMode();
+        for(Player player : selectedPlayerList){
+            if(player.getRole() != Role.ADMIN) {
+                createServer(player.getPlayerAddress());
+            }
+        }
+    }
+
+    private void connectToServer(){
+        selectClientMode();
+        createClient(admin.getPlayerAddress());
+    }
+
+
+    @Override
+    public void onBluetoothDeviceFound(BluetoothDevice device) {
+
+    }
+
+    @Override
+    public void onClientConnectionSuccess() {
+        Log.d("Client Connection ", mBluetoothManager.getYourBtMacAddress() + mBluetoothManager.getDeviceName());
+    }
+
+    @Override
+    public void onClientConnectionFail() {
+
+    }
+
+    @Override
+    public void onServerConnectionSuccess() {
+        sendMessage(MessageGenerator.getPlayerListMessage(gameUBID, selectedPlayerList));
+    }
+
+    @Override
+    public void onServerConnectionFail() {
+
+    }
+
+    @Override
+    public void onBluetoothStartDiscovery() {
+
+    }
+
+    @Override
+    public void onBluetoothCommunicator(String messageReceive) {
+        Log.d("MessageReceived", messageReceive);
+        if(role == Role.ADMIN){
+            sendMessage(messageReceive);
+        }
+        actOnMessage(messageReceive);
+    }
+
+    private void actOnMessage(String message){
+        try {
+            JSONObject jsonObject = new JSONObject(message);
+            MessageType messageType = MessageType.valueOf(jsonObject.getString("MessageType"));
+            int receivedMessageCounter = jsonObject.getInt("MessageCounter");
+            String receivedGameUBID = jsonObject.getString("GameUBID");
+            if(lastHandledMessage < receivedMessageCounter && (gameUBID == null || gameUBID == receivedGameUBID)) {
+                if (messageType == MessageType.PlayerList) {
+                    if (role == Role.PLAYER && gameUBID == null) {
+                        gameUBID = receivedGameUBID;
+                        lastHandledMessage = receivedMessageCounter;
+                        selectedPlayerList = (new Gson()).fromJson(jsonObject.get("PlayerList").toString(), new TypeToken<ArrayList<Player>>() {
+                        }.getType());
+                        createPlayerButtons();
+                    }
+                } else if (messageType == MessageType.Deck && gameUBID != null) {
+                    lastHandledMessage = receivedMessageCounter;
+                    //TODO:
+                }
+            }
+        } catch(Exception e){
+            Log.e(Constant.LOG_TAG, e.getMessage());
+        }
+    }
+
+    @Override
+    public void onBluetoothNotAvailable() {
 
     }
 }

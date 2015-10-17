@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
@@ -60,6 +61,8 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     LinearListLayout playerListView;
 
     ArrayList<Player> players;
+    Player admin,self;
+
 
     ArrayList<Player> selectedPlayerList;
 
@@ -82,12 +85,25 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @Override
     public void onBluetoothDeviceFound(BluetoothDevice device) {
-        if (role != null && role == Role.ADMIN && isRelevantDevice(device)) {
-            Log.d(Constant.LOG_TAG, device.getName());
-            Player player = new Player(device, Role.PLAYER);
-            players.add(player);
-            playerListAdapter = new PlayerListAdapter(this, players);
-            playerListView.setAdapter(playerListAdapter);
+        if (role != null){
+            if(isRelevantDevice(device)) {
+                if(role == Role.ADMIN) {
+                    Log.d(Constant.LOG_TAG, device.getName());
+                    Player player = new Player(device.getName(), device.getAddress());
+                    if(!players.contains(player)) {
+                        players.add(player);
+                        selectedPlayerList.clear();
+                        playerListAdapter = new PlayerListAdapter(this, players);
+                        playerListView.setAdapter(playerListAdapter);
+                    }
+                }else if (role == Role.PLAYER){
+                    Log.d(Constant.LOG_TAG, device.getName());
+                    if(isAdmin(device)){
+                        admin = new Player(device.getName(), device.getAddress());
+                        btnContinue.setEnabled(true);
+                    }
+                }
+            }
         }
     }
 
@@ -137,11 +153,13 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @OnClick(R.id.btn_start)
     public void adminModeStartClick() {
-        //setGameName("DeckOfCards");
-        //setPlayerName("Admin");
-        updateBluetoothAdapterName("DeckOfCards", "Admin");
         role = Role.ADMIN;
+        updateBluetoothAdapterName("DeckOfCards", "Admin", role);
         initializePlayerList();
+        Player player = new Player(mBluetoothManager.getDeviceName(), mBluetoothManager.getYourBtMacAddress());
+        if(!players.contains(player)) {
+            players.add(player);
+        }
         setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
         startDiscovery();
         scanAllBluetoothDevice();
@@ -154,16 +172,21 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @OnClick(R.id.btn_player)
     public void onPlayerModeClick() {
-        //setGameName("DeckOfCards");
-        //setPlayerName("Player");
-        updateBluetoothAdapterName("DeckOfCards", "Player");
         role = Role.PLAYER;
+        updateBluetoothAdapterName("DeckOfCards", "Player", role);
         setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
         startDiscovery();
+        scanAllBluetoothDevice();
     }
 
     private void continueGame() {
         Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra("ROLE", role);
+        if(role == Role.ADMIN) {
+            intent.putExtra("PLAYERS", selectedPlayerList);
+        }else{
+            intent.putExtra("ADMIN", admin);
+        }
         startActivity(intent);
     }
 
@@ -224,6 +247,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     @Override
     public void onPerformPlayerSelect(Player player) {
         selectedPlayerList.add(player);
+        btnContinue.setEnabled(selectedPlayerList.size()>1);
         Toast.makeText(this, player.getPlayerName(), Toast.LENGTH_SHORT).show();
     }
 
@@ -231,6 +255,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     public void onPerformPlayerDeselect(Player player) {
         if (selectedPlayerList.contains(player)) {
             selectedPlayerList.remove(player);
+            btnContinue.setEnabled(selectedPlayerList.size()>1);
             Toast.makeText(this, player.getPlayerName(), Toast.LENGTH_SHORT).show();
         }
     }

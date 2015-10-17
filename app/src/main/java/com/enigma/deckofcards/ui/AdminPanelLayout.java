@@ -65,5 +65,4 @@ public class AdminPanelLayout extends LinearLayout {
         heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) mCurrentHeight, MeasureSpec.AT_MOST);
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
     }
-
 }
