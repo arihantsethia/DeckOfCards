@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.enigma.deckofcards.Constant;
 import com.enigma.deckofcards.Player;
+import com.enigma.deckofcards.R;
 import com.enigma.deckofcards.Role;
 import com.enigma.deckofcards.adapter.PlayerListAdapter;
 import com.enigma.deckofcards.bluetooth.mananger.BluetoothManager;
@@ -23,8 +24,6 @@ import com.enigma.deckofcards.ui.LinearListLayout;
 import com.enigma.deckofcards.ui.UiContext;
 
 import java.util.ArrayList;
-
-import com.enigma.deckofcards.R;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -62,9 +61,9 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     ArrayList<Player> players;
 
-    boolean adminPanelExpanded = false;
+    ArrayList<Player> selectedPlayerList;
 
-    ArrayList<String> selectedPlayerList = new ArrayList<String>();
+    boolean adminPanelExpanded = false;
 
 
     @Override
@@ -74,6 +73,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
         mUiCtxt = UiContext.getInstance();
         mAppContext = getApplicationContext();
         mUiCtxt.setContextAndHandler(mAppContext);
+        selectedPlayerList = new ArrayList<Player>();
 
         setContentView(R.layout.activity_main);
 
@@ -82,7 +82,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @Override
     public void onBluetoothDeviceFound(BluetoothDevice device) {
-        if(role != null && role == Role.ADMIN && isRelevantDevice(device)) {
+        if (role != null && role == Role.ADMIN && isRelevantDevice(device)) {
             Log.d(Constant.LOG_TAG, device.getName());
             Player player = new Player(device, Role.PLAYER);
             players.add(player);
@@ -127,7 +127,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     }
 
     @OnClick(R.id.btn_admin)
-    public void onAdminModeClick(){
+    public void onAdminModeClick() {
         if (adminPanelExpanded) {
             animateCollapseAdminPanel();
         } else {
@@ -136,11 +136,11 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     }
 
     @OnClick(R.id.btn_start)
-    public void adminModeStartClick(){
+    public void adminModeStartClick() {
         //setGameName("DeckOfCards");
         //setPlayerName("Admin");
         updateBluetoothAdapterName("DeckOfCards", "Admin");
-        role =  Role.ADMIN;
+        role = Role.ADMIN;
         initializePlayerList();
         setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
         startDiscovery();
@@ -148,16 +148,16 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     }
 
     @OnClick(R.id.btn_continue)
-    public void adminModeGameStartClick(){
+    public void adminModeGameStartClick() {
         continueGame();
     }
 
     @OnClick(R.id.btn_player)
-    public void onPlayerModeClick(){
+    public void onPlayerModeClick() {
         //setGameName("DeckOfCards");
         //setPlayerName("Player");
         updateBluetoothAdapterName("DeckOfCards", "Player");
-        role =  Role.PLAYER;
+        role = Role.PLAYER;
         setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
         startDiscovery();
     }
@@ -222,16 +222,16 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     }
 
     @Override
-    public void onPerformPlayerSelect(String playerName) {
-        selectedPlayerList.add(playerName);
-        Toast.makeText(this, playerName, Toast.LENGTH_SHORT).show();
+    public void onPerformPlayerSelect(Player player) {
+        selectedPlayerList.add(player);
+        Toast.makeText(this, player.getPlayerName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onPerformPlayerDeselect(String playerName) {
-        if (selectedPlayerList.contains(playerName)) {
-            selectedPlayerList.remove(playerName);
-            Toast.makeText(this, playerName, Toast.LENGTH_SHORT).show();
+    public void onPerformPlayerDeselect(Player player) {
+        if (selectedPlayerList.contains(player)) {
+            selectedPlayerList.remove(player);
+            Toast.makeText(this, player.getPlayerName(), Toast.LENGTH_SHORT).show();
         }
     }
 }

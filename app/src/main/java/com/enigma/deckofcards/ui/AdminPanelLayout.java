@@ -26,7 +26,7 @@ public class AdminPanelLayout extends LinearLayout {
         // TODO Auto-generated constructor stub
     }
 
-    private void initialize() {
+    private void initialize(){
         setCurrentHeight((int) mUiContext.dpToPx(0.0f));
     }
 
@@ -43,12 +43,12 @@ public class AdminPanelLayout extends LinearLayout {
         //		canvas.clipRect(mRect);
     }
 
-    public int getCurrentHeight() {
-        return mCurrentHeight;
-    }
-
     public void setCurrentHeight(int height) {
         mCurrentHeight = height;
+    }
+
+    public int getCurrentHeight() {
+        return mCurrentHeight;
     }
 
     @SuppressLint("DefaultLocale")

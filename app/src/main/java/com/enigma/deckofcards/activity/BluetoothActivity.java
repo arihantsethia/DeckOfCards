@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.enigma.deckofcards.bluetooth.mananger.BluetoothManager;
 import com.enigma.deckofcards.bus.BluetoothCommunicator;
@@ -55,11 +54,11 @@ public abstract class BluetoothActivity extends AppCompatActivity {
     }
 
     protected boolean isRelevantDevice(BluetoothDevice device) {
-        return (device.getName()!=null) && (device.getName().startsWith(mBluetoothManager.getGameName()));
+        return (device.getName() != null) && (device.getName().startsWith(mBluetoothManager.getGameName()));
     }
 
 
-    protected void updateBluetoothAdapterName(String gameName, String playerName){
+    protected void updateBluetoothAdapterName(String gameName, String playerName) {
         mBluetoothManager.setGameName(gameName);
         mBluetoothManager.setPlayerName(playerName);
         mBluetoothManager.updateName();

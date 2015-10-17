@@ -3,62 +3,111 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    tools:context="com.enigma.MainActivity">
+    tools:context="deck.of.cards.MainActivity" >
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-        <Button
+        <LinearLayout
+            android:id="@+id/player_panel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal" >
+
+            <!--
+         <Button
             android:id="@+id/player_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Player 1" />
-
-        <Button
+         <Button
             android:id="@+id/player_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Player 2" />
-
-        <Button
+          <Button
             android:id="@+id/player_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Player 3" />
-
-        <Button
+           <Button
             android:id="@+id/player_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Player 4" />
-    </LinearLayout>
+            -->
+
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/distribute"
+        <HorizontalScrollView
+            android:id="@+id/scroller_card_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:id="@+id/card_panel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal" >
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <LinearLayout
+            android:id="@+id/command_panel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Distribute 1" />
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal" >
 
-        <Button
-            android:id="@+id/take_cards"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Take Cards" />
+            <Button
+                android:id="@+id/distribute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Distribute" />
 
-        <Button
-            android:id="@+id/move_cards"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Move Cards" />
+            <Button
+                android:id="@+id/show_cards"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show Cards" />
 
+            <Button
+                android:id="@+id/start_game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start Game" />
+
+            <Button
+                android:id="@+id/place_card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Place Card"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/take_card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Take Card"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/move_to_trash"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Move to Thrash"
+                android:visibility="gone" />
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>

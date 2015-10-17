@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -30,18 +31,24 @@ public class LinearListLayout extends LinearLayout {
         // TODO Auto-generated constructor stub
     }
 
+    public float dpToPx(float dp) {
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        float px = dp * displayMetrics.density + 0.5f;
+        return px;
+    }
+
     public void setAdapter(PlayerListAdapter adapter) {
-        //		removeAllViews();
-        Toast.makeText(mContext, adapter.getCount() + "", Toast.LENGTH_SHORT).show();
+        removeAllViews();
 
         for (int i = 0; i < adapter.getCount(); i++) {
 
             View v = adapter.getView(i, this);
-            v.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 150));
-            //			settingVault.InfoList.addView(v);
+            v.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, (int) dpToPx(30.0f)));
             addView(v);
         }
-        //		refreshDrawableState();
+
+        setCurrentHeight((int) (adapter.getCount() * dpToPx(30.0f)));
+        requestLayout();
     }
 
     public void setClipRectHeight(float height) {
@@ -54,15 +61,14 @@ public class LinearListLayout extends LinearLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //		canvas.clipRect(mRect);
-    }
-
-    public int getCurrentHeight() {
-        return mCurrentHeight;
     }
 
     public void setCurrentHeight(int height) {
         mCurrentHeight = height;
+    }
+
+    public int getCurrentHeight() {
+        return mCurrentHeight;
     }
 
     @SuppressLint("DefaultLocale")
