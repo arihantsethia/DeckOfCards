@@ -3,24 +3,29 @@ package com.enigma.deckofcards;
 import android.bluetooth.BluetoothDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import org.parceler.apache.commons.lang.builder.EqualsBuilder;
-
 /**
  * Created by sethiaa on 17/10/15.
  */
+
 public class Player implements Parcelable {
     String playerDeviceName;
     String playerAddress;
+    int identifier;
 
-    public Player(String playerDeviceName, String playerAddress) {
+    public Player(String playerDeviceName, String playerAddress, int identifier) {
         this.playerDeviceName = playerDeviceName;
         this.playerAddress = playerAddress;
+        this.identifier = identifier;
     }
 
     protected Player(Parcel in) {
         playerDeviceName = in.readString();
         playerAddress = in.readString();
+        identifier = in.readInt();
+    }
+
+    public int getIdentifier(){
+        return identifier;
     }
 
 
@@ -49,6 +54,7 @@ public class Player implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(playerDeviceName);
         dest.writeString(playerAddress);
+        dest.writeInt(identifier);
     }
 
     @SuppressWarnings("unused")

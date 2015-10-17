@@ -61,7 +61,8 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     LinearListLayout playerListView;
 
     ArrayList<Player> players;
-    Player admin,self;
+    Player admin;
+    int playerCounter;
 
 
     ArrayList<Player> selectedPlayerList;
@@ -77,7 +78,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
         mAppContext = getApplicationContext();
         mUiCtxt.setContextAndHandler(mAppContext);
         selectedPlayerList = new ArrayList<Player>();
-
+        playerCounter = 0;
         setContentView(R.layout.activity_main);
 
         ButterKnife.inject(this);
@@ -89,8 +90,9 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
             if(isRelevantDevice(device)) {
                 if(role == Role.ADMIN) {
                     Log.d(Constant.LOG_TAG, device.getName());
-                    Player player = new Player(device.getName(), device.getAddress());
+                    Player player = new Player(device.getName(), device.getAddress(), playerCounter);
                     if(!players.contains(player)) {
+                        playerCounter++;
                         players.add(player);
                         selectedPlayerList.clear();
                         playerListAdapter = new PlayerListAdapter(this, players);
@@ -99,7 +101,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
                 }else if (role == Role.PLAYER){
                     Log.d(Constant.LOG_TAG, device.getName());
                     if(isAdmin(device)){
-                        admin = new Player(device.getName(), device.getAddress());
+                        admin = new Player(device.getName(), device.getAddress(), playerCounter++);
                         btnContinue.setEnabled(true);
                     }
                 }
@@ -156,9 +158,10 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
         role = Role.ADMIN;
         updateBluetoothAdapterName("DeckOfCards", "Admin", role);
         initializePlayerList();
-        Player player = new Player(mBluetoothManager.getDeviceName(), mBluetoothManager.getYourBtMacAddress());
+        Player player = new Player(mBluetoothManager.getDeviceName(), mBluetoothManager.getYourBtMacAddress(), playerCounter);
         if(!players.contains(player)) {
             players.add(player);
+            playerCounter++;
         }
         setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
         startDiscovery();
@@ -167,7 +170,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @OnClick(R.id.btn_continue)
     public void adminModeGameStartClick() {
-        continueGame();
+        continueGame("Admin");
     }
 
     @OnClick(R.id.btn_player)
@@ -179,7 +182,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
         scanAllBluetoothDevice();
     }
 
-    private void continueGame() {
+    private void continueGame(String value) {
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtra("ROLE", role);
         if(role == Role.ADMIN) {
