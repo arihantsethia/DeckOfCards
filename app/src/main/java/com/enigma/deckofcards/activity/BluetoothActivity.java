@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.enigma.deckofcards.bluetooth.mananger.BluetoothManager;
 import com.enigma.deckofcards.bus.BluetoothCommunicator;
@@ -18,7 +19,6 @@ import de.greenrobot.event.EventBus;
 public abstract class BluetoothActivity extends AppCompatActivity {
 
     protected BluetoothManager mBluetoothManager;
-    protected String mGameName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,24 +54,23 @@ public abstract class BluetoothActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isRelevantDevice(BluetoothDevice device) {
-        return !device.getName().isEmpty() && device.getName().startsWith(getGameName());
+    protected boolean isRelevantDevice(BluetoothDevice device) {
+        return (device.getName()!=null) && (device.getName().startsWith(mBluetoothManager.getGameName()));
     }
 
-    private String getGameName() {
-        return mGameName;
-    }
 
-    private void setGameName(String gameName) {
-        mGameName = gameName;
+    protected void updateBluetoothAdapterName(String gameName, String playerName){
+        mBluetoothManager.setGameName(gameName);
+        mBluetoothManager.setPlayerName(playerName);
+        mBluetoothManager.updateName();
     }
 
     public void closeAllConnexion() {
-        mBluetoothManager.closeAllConnexion();
+        mBluetoothManager.closeAllConnection();
     }
 
     public void checkBluetoothAviability() {
-        if (!mBluetoothManager.checkBluetoothAviability()) {
+        if (!mBluetoothManager.checkBluetoothAvailability()) {
             onBluetoothNotAvailable();
         }
     }
@@ -97,7 +96,7 @@ public abstract class BluetoothActivity extends AppCompatActivity {
     }
 
     public void createServer(String address) {
-        mBluetoothManager.createServeur(address);
+        mBluetoothManager.createServer(address);
     }
 
     public void selectServerMode() {
@@ -150,9 +149,9 @@ public abstract class BluetoothActivity extends AppCompatActivity {
 
     public void onEventMainThread(BluetoothDevice device) {
         onBluetoothDeviceFound(device);
-        if (isRelevantDevice(device)) {
+        /*if (isRelevantDevice(device)) {
             createServer(device.getAddress());
-        }
+        }*/
     }
 
     public void onEventMainThread(ClientConnectionSuccess event) {

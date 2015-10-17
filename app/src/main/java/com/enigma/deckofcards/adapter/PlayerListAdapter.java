@@ -12,6 +12,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.enigma.deckofcards.Player;
 import com.enigma.deckofcards.ui.UiContext;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class PlayerListAdapter {
 
     UiContext mUiCtxt = UiContext.getInstance();
     ViewConfiguration vc = ViewConfiguration.get(mUiCtxt.getAppContext());
-    ArrayList<String> player_list;
+    ArrayList<Player> player_list;
     Activity mActivity;
     private Context mContext = UiContext.getInstance().getAppContext();
     private int SWIPE_MIN_DISTANCE = vc.getScaledTouchSlop();
@@ -43,10 +44,10 @@ public class PlayerListAdapter {
     private float downX, downY, upX, upY, deltaX, deltaY;
     private long timeDown, deltaTime;
 
-    public PlayerListAdapter(Activity activity, ArrayList<String> list) {
-        player_list = new ArrayList<String>();
+    public PlayerListAdapter(Activity activity, ArrayList<Player> list) {
+        player_list = new ArrayList<Player>();
         mActivity = activity;
-        for (String el : list) {
+        for (Player el : list) {
             player_list.add(el);
         }
     }
@@ -82,22 +83,22 @@ public class PlayerListAdapter {
 				//					if(vh.isselected == true){
 				//						vh.isselected = false;
 				//						v.setBackgroundColor(Color.argb(255, 241, 241, 241));
-				//						mActivity.perform_player_deselect(player_list.get(position));
+				//						mActivity.performPlayerDeselect(player_list.get(position));
 				//					}
 				//					else{
 				//						vh.isselected = true;
 				//						v.setBackgroundColor(Color.argb(255, 236, 234, 104));
-				//						mActivity.perform_player_select(player_list.get(position));
+				//						mActivity.performPlayerSelect(player_list.get(position));
 				//					}
 
 				if (((String) v.getTag()).equalsIgnoreCase("NOTSELECTED")) {
 					v.setTag(new String("SELECTED"));
 					v.setBackgroundColor(Color.argb(255, 236, 234, 104));
-					mActivity.perform_player_select(player_list.get(position));
+					mActivity.performPlayerSelect(player_list.get(position));
 				} else {
 					v.setTag(new String("NOTSELECTED"));
 					v.setBackgroundColor(Color.argb(255, 241, 241, 241));
-					mActivity.perform_player_deselect(player_list.get(position));
+					mActivity.performPlayerDeselect(player_list.get(position));
 				}
 
 			}
@@ -143,4 +144,6 @@ public class PlayerListAdapter {
         TextView player;
         boolean isselected = false;
     }
+
+
 }

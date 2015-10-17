@@ -26,7 +26,7 @@ public abstract class BluetoothFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mBluetoothManager = new BluetoothManager(getActivity());
-        checkBluetoothAviability();
+        checkBluetoothAvailability();
         mBluetoothManager.setNbrClientMax(myNbrClientMax());
     }
 
@@ -59,11 +59,11 @@ public abstract class BluetoothFragment extends Fragment {
     }
 
     public void closeAllConnexion() {
-        mBluetoothManager.closeAllConnexion();
+        mBluetoothManager.closeAllConnection();
     }
 
-    public void checkBluetoothAviability() {
-        if (!mBluetoothManager.checkBluetoothAviability()) {
+    public void checkBluetoothAvailability() {
+        if (!mBluetoothManager.checkBluetoothAvailability()) {
             onBluetoothNotAviable();
         }
     }
@@ -93,7 +93,7 @@ public abstract class BluetoothFragment extends Fragment {
     }
 
     public void createServeur(String address) {
-        mBluetoothManager.createServeur(address);
+        mBluetoothManager.createServer(address);
     }
 
     public void selectServerMode() {

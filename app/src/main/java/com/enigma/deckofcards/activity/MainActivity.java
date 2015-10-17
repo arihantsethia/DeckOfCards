@@ -4,16 +4,20 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
-import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.enigma.deckofcards.Constant;
+import com.enigma.deckofcards.Player;
+import com.enigma.deckofcards.Role;
 import com.enigma.deckofcards.adapter.PlayerListAdapter;
+import com.enigma.deckofcards.bluetooth.mananger.BluetoothManager;
+import com.enigma.deckofcards.listener.PlayerListSelectionListener;
 import com.enigma.deckofcards.ui.AdminPanelLayout;
 import com.enigma.deckofcards.ui.LinearListLayout;
 import com.enigma.deckofcards.ui.UiContext;
@@ -22,28 +26,45 @@ import java.util.ArrayList;
 
 import com.enigma.deckofcards.R;
 
-public class MainActivity extends Activity {
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+
+public class MainActivity extends BluetoothActivity implements PlayerListSelectionListener {
 
     final int TIME_ANIMATION_EXPAND_COLLAPSE = 500;
 
     Context mAppContext;
     UiContext mUiCtxt;
+    Role role;
+    PlayerListAdapter playerListAdapter;
 
-    Button btn_admin;
-    Button btn_player;
-    Button btn_start;
-    Button btn_end;
-    Button btn_continue;
+    @InjectView(R.id.btn_admin)
+    Button btnAdmin;
 
-    AdminPanelLayout admin_panel;
+    @InjectView(R.id.btn_player)
+    Button btnPlayer;
 
-    LinearListLayout player_listview;
+    @InjectView(R.id.btn_start)
+    Button btnStart;
 
-    ArrayList<String> players;
+    @InjectView(R.id.btn_end)
+    Button btnEnd;
 
-    boolean admin_panel_expanded = false;
+    @InjectView(R.id.btn_continue)
+    Button btnContinue;
 
-    ArrayList<String> selected_player_list = new ArrayList<String>();
+    @InjectView(R.id.list_adminpanel)
+    AdminPanelLayout adminPanel;
+
+    @InjectView(R.id.list_players)
+    LinearListLayout playerListView;
+
+    ArrayList<Player> players;
+
+    boolean adminPanelExpanded = false;
+
+    ArrayList<String> selectedPlayerList = new ArrayList<String>();
 
 
     @Override
@@ -56,84 +77,113 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
 
+        ButterKnife.inject(this);
+    }
 
-        btn_admin = (Button) findViewById(R.id.btn_admin);
-        btn_player = (Button) findViewById(R.id.btn_player);
-        admin_panel = (AdminPanelLayout) findViewById(R.id.list_adminpanel);
-        btn_start = (Button) findViewById(R.id.btn_start);
-        btn_end = (Button) findViewById(R.id.btn_end);
-        btn_continue = (Button) findViewById(R.id.btn_continue);
-        player_listview = (LinearListLayout) findViewById(R.id.list_players);
-
-        if (btn_admin != null) {
-            btn_admin.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    if (admin_panel_expanded) {
-                        animate_collapse_adminpanel();
-                    } else {
-                        animate_expand_adminpanel();
-                    }
-                }
-            });
+    @Override
+    public void onBluetoothDeviceFound(BluetoothDevice device) {
+        if(role != null && role == Role.ADMIN && isRelevantDevice(device)) {
+            Log.d(Constant.LOG_TAG, device.getName());
+            Player player = new Player(device, Role.PLAYER);
+            players.add(player);
+            playerListAdapter = new PlayerListAdapter(this, players);
+            playerListView.setAdapter(playerListAdapter);
         }
+    }
 
-        if (btn_start != null) {
-            btn_start.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    initialize_playerlist();
-                }
-            });
-        }
-
-        if (btn_continue != null) {
-            btn_continue.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    continue_game();
-                }
-            });
-        }
-
-//		if(player_listview !=null){
-//			player_listview.setOnItemClickListener(new OnItemClickListener() {
-//
-//				@Override
-//				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//					perform_player_select(players.get(position));
-//				}
-//			});
-//		}
-
+    @Override
+    public void onClientConnectionSuccess() {
 
     }
 
-    private void continue_game() {
+    @Override
+    public void onClientConnectionFail() {
+
+    }
+
+    @Override
+    public void onServerConnectionSuccess() {
+
+    }
+
+    @Override
+    public void onServerConnectionFail() {
+
+    }
+
+    @Override
+    public void onBluetoothStartDiscovery() {
+
+    }
+
+    @Override
+    public void onBluetoothCommunicator(String messageReceive) {
+
+    }
+
+    @Override
+    public void onBluetoothNotAvailable() {
+
+    }
+
+    @OnClick(R.id.btn_admin)
+    public void onAdminModeClick(){
+        if (adminPanelExpanded) {
+            animateCollapseAdminPanel();
+        } else {
+            animateExpandAdminPanel();
+        }
+    }
+
+    @OnClick(R.id.btn_start)
+    public void adminModeStartClick(){
+        //setGameName("DeckOfCards");
+        //setPlayerName("Admin");
+        updateBluetoothAdapterName("DeckOfCards", "Admin");
+        role =  Role.ADMIN;
+        initializePlayerList();
+        setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
+        startDiscovery();
+        scanAllBluetoothDevice();
+    }
+
+    @OnClick(R.id.btn_continue)
+    public void adminModeGameStartClick(){
+        continueGame();
+    }
+
+    @OnClick(R.id.btn_player)
+    public void onPlayerModeClick(){
+        //setGameName("DeckOfCards");
+        //setPlayerName("Player");
+        updateBluetoothAdapterName("DeckOfCards", "Player");
+        role =  Role.PLAYER;
+        setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
+        startDiscovery();
+    }
+
+    private void continueGame() {
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }
 
-    private void animate_expand_adminpanel() {
-        if (admin_panel != null) {
+    private void animateExpandAdminPanel() {
+        if (adminPanel != null) {
             ValueAnimator expand = ValueAnimator.ofInt(0, (int) mUiCtxt.dpToPx(300.0f));
             expand.addUpdateListener(new AnimatorUpdateListener() {
 
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
                     int height = ((Integer) animation.getAnimatedValue()).intValue();
-                    admin_panel.setCurrentHeight(height);
-                    admin_panel.requestLayout();
+                    adminPanel.setCurrentHeight(height);
+                    adminPanel.requestLayout();
                 }
             });
             expand.addListener(new AnimatorListenerAdapter() {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    admin_panel_expanded = true;
+                    adminPanelExpanded = true;
                 }
             });
             expand.setDuration(TIME_ANIMATION_EXPAND_COLLAPSE);
@@ -141,23 +191,23 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void animate_collapse_adminpanel() {
-        if (admin_panel != null) {
+    private void animateCollapseAdminPanel() {
+        if (adminPanel != null) {
             ValueAnimator expand = ValueAnimator.ofInt((int) mUiCtxt.dpToPx(300.0f), 0);
             expand.addUpdateListener(new AnimatorUpdateListener() {
 
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
                     int height = ((Integer) animation.getAnimatedValue()).intValue();
-                    admin_panel.setCurrentHeight(height);
-                    admin_panel.requestLayout();
+                    adminPanel.setCurrentHeight(height);
+                    adminPanel.requestLayout();
                 }
             });
             expand.addListener(new AnimatorListenerAdapter() {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    admin_panel_expanded = false;
+                    adminPanelExpanded = false;
                 }
             });
             expand.setDuration(TIME_ANIMATION_EXPAND_COLLAPSE);
@@ -165,32 +215,23 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void initialize_playerlist() {
-        players = new ArrayList<String>();
-        players.add("Player 1");
-        players.add("Player 2");
-        players.add("Player 3");
-        players.add("Player 4");
-        players.add("Player 5");
-        players.add("Player 6");
-        players.add("Player 7");
-
-        Toast.makeText(this, "Init", Toast.LENGTH_SHORT).show();
-
-
-        PlayerListAdapter player_list_adapter = new PlayerListAdapter(this, players);
-        player_listview.setAdapter(player_list_adapter);
+    private void initializePlayerList() {
+        players = new ArrayList<Player>();
+        playerListAdapter = new PlayerListAdapter(this, players);
+        playerListView.setAdapter(playerListAdapter);
     }
 
-    public void perform_player_select(String player_name) {
-        selected_player_list.add(player_name);
-        Toast.makeText(this, player_name, Toast.LENGTH_SHORT).show();
+    @Override
+    public void onPerformPlayerSelect(String playerName) {
+        selectedPlayerList.add(playerName);
+        Toast.makeText(this, playerName, Toast.LENGTH_SHORT).show();
     }
 
-    public void perform_player_deselect(String player_name) {
-        if (selected_player_list.contains(player_name)) {
-            selected_player_list.remove(player_name);
-            Toast.makeText(this, player_name, Toast.LENGTH_SHORT).show();
+    @Override
+    public void onPerformPlayerDeselect(String playerName) {
+        if (selectedPlayerList.contains(playerName)) {
+            selectedPlayerList.remove(playerName);
+            Toast.makeText(this, playerName, Toast.LENGTH_SHORT).show();
         }
     }
 }

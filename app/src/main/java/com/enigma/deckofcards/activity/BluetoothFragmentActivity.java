@@ -57,11 +57,11 @@ public abstract class BluetoothFragmentActivity extends FragmentActivity {
     }
 
     public void closeAllConnexion() {
-        mBluetoothManager.closeAllConnexion();
+        mBluetoothManager.closeAllConnection();
     }
 
     public void checkBluetoothAviability() {
-        if (!mBluetoothManager.checkBluetoothAviability()) {
+        if (!mBluetoothManager.checkBluetoothAvailability()) {
             onBluetoothNotAviable();
         }
     }
@@ -91,7 +91,7 @@ public abstract class BluetoothFragmentActivity extends FragmentActivity {
     }
 
     public void createServeur(String address) {
-        mBluetoothManager.createServeur(address);
+        mBluetoothManager.createServer(address);
     }
 
     public void selectServerMode() {
