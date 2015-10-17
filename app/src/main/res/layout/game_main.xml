@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    tools:context="deck.of.cards.MainActivity" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <Button
+            android:id="@+id/player_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Player 1" />
+         <Button
+            android:id="@+id/player_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Player 2" />
+          <Button
+            android:id="@+id/player_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Player 3" />
+           <Button
+            android:id="@+id/player_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Player 4" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true" >
+        <Button
+            android:id="@+id/distribute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distribute 1" />
+         <Button
+            android:id="@+id/take_cards"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Take Cards" />
+          <Button
+            android:id="@+id/move_cards"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Move Cards" />
+           
+    </LinearLayout>
+
+</RelativeLayout>

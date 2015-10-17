@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="holo_blue">#33e5b5</color>
+    <color name="darker_blue">#31748f</color>
+    <color name="blue">#26aaed</color>
+    <color name="purple">#a787ff</color>
+    <color name="transparent">#000000</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="offwhite">#f1f1f1</color>
+    <color name="gray">#bdbdbd</color>
+    <color name="green">#2ec161</color>
+    <color name="yellow">#fff540</color>
+    <color name="orange">#fa7234</color>
+    <color name="red">#ff290a</color>
+    <color name="keypad">#BABABA</color>
+
+</resources>
