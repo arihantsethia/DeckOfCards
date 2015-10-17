@@ -149,7 +149,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @OnClick(R.id.btn_continue)
     public void adminModeGameStartClick() {
-        continueGame();
+        continueGame("Admin");
     }
 
     @OnClick(R.id.btn_player)
@@ -160,10 +160,19 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
         role = Role.PLAYER;
         setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
         startDiscovery();
+        continueGame("Player");
     }
 
-    private void continueGame() {
+    private void continueGame(String value) {
         Intent intent = new Intent(this, GameActivity.class);
+        ArrayList<String> selectedListOfPlayers = new ArrayList<String>();
+        selectedListOfPlayers.add("Player-1");
+        selectedListOfPlayers.add("Player-2");
+        selectedListOfPlayers.add("Player-3");
+        selectedListOfPlayers.add("Player-4");
+//        intent.putExtra("PLAYERS",selectedPlayerList);
+//        intent.putExtra("Role",value);
+        intent.putStringArrayListExtra("PLAYERS", selectedListOfPlayers);
         startActivity(intent);
     }
 

@@ -1,11 +1,13 @@
 package com.enigma.deckofcards;
 
 import android.bluetooth.BluetoothDevice;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by sethiaa on 17/10/15.
  */
-public class Player {
+public class Player  implements Parcelable {
     BluetoothDevice playerDevice;
     Role role;
 
@@ -32,5 +34,15 @@ public class Player {
 
     public Role getRole() {
         return role;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
     }
 }

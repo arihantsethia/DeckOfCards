@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,11 +30,16 @@ public class GameActivity extends Activity {
 
     int totalNoOfCards = 52;
     int noOfCardsPerPlayer = 0;
+    int totalCardsDistributed = 0;
+    int totalUnusedCards = 0;
 
     boolean gameStarted = false;
 
     Context mAppContext;
     UiContext mUiCtxt;
+
+    @InjectView(R.id.center_container)
+    FrameLayout centerContainer;
 
     @InjectView(R.id.distribute)
     Button distribute;
@@ -44,14 +50,17 @@ public class GameActivity extends Activity {
     @InjectView(R.id.start_game)
     Button startGame;
 
-    @InjectView(R.id.take_card)
-    Button takeCard;
+    @InjectView(R.id.from_unused)
+    Button fromUnused;
 
     @InjectView(R.id.place_card)
     Button placeCard;
 
-    @InjectView(R.id.move_to_trash)
-    Button moveTrash;
+    @InjectView(R.id.from_table)
+    Button fromTable;
+
+    @InjectView(R.id.btn_unused)
+    Button unused;
 
     @InjectView(R.id.player_panel)
     LinearLayout playerPanel;
@@ -62,6 +71,7 @@ public class GameActivity extends Activity {
     @InjectView(R.id.scroller_card_panel)
     HorizontalScrollView scrollerCardPanel;
 
+
     ArrayList<String> tempCardsImageNames;
 
     ArrayList<String> selectedPlayerList;
@@ -69,6 +79,8 @@ public class GameActivity extends Activity {
     HashMap<Button, Integer> collectionPlayers = new HashMap<Button, Integer>();
     ArrayList<String> selectedCardValue = new ArrayList<String>();
     ArrayList<String> selectedCardColor = new ArrayList<String>();
+    ArrayList<String> unusedCardsList = new ArrayList<String>();
+    ArrayList<String> centerCardCollection = new ArrayList<String>();
     ArrayList<ImageView> selectedCardImages = new ArrayList<ImageView>();
 
     @Override
@@ -86,7 +98,7 @@ public class GameActivity extends Activity {
         ButterKnife.inject(this);
 
         if (intent != null) {
-
+        String ROle=intent.getStringExtra("Role");
             selectedPlayerList = intent.getStringArrayListExtra("PLAYERS");
             for (int i = 0; i < selectedPlayerList.size(); i++) {
                 Button player = new Button(this);
@@ -119,6 +131,7 @@ public class GameActivity extends Activity {
             String text = selectedPlayerList.get(tag) + " (" + noOfCardsPerPlayer + ")";
             btn.setText(text);
         }
+        totalCardsDistributed = 52;
     }
 
     @OnClick(R.id.show_cards)
@@ -126,17 +139,50 @@ public class GameActivity extends Activity {
         //TODO: Logic For Show Cards
     }
 
-    @OnClick(R.id.take_card)
-    public void onTakeCard(){
+    @OnClick(R.id.from_table)
+    public void onFromTable(){
         //TODO: Logic For Take Cards
+        if(centerCardCollection.isEmpty())
+            return;
+
+        int childCount = centerContainer.getChildCount();
+
+        for(int i=0;i<childCount;i++){
+            ImageView card = (ImageView) centerContainer.getChildAt(0);
+            centerContainer.removeView(card);
+            card.setTranslationY(0.0f);
+            cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+        }
+
+        centerCardCollection.clear();
     }
 
-    @OnClick(R.id.move_to_trash)
-    public void onMoveTrash() {
+    @OnClick(R.id.from_unused)
+    public void onFromUnused() {
+        if(unusedCardsList.isEmpty())
+            return;
 
+        String cardName = unusedCardsList.get(0);
+        --totalUnusedCards;
+        unusedCardsList.remove(0);
+        ImageView card = new ImageView(getApplicationContext());
+        card.setImageResource(getNextCardImage(cardName));
+        card.setTag(cardName);
+        if (card != null) {
+            card.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    v.setTranslationY(-mUiCtxt.dpToPx(10.0f));
+                    selectCard((ImageView) v);
+                }
+            });
+        }
+        cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+        unused.setText(totalUnusedCards + " cards");
     }
 
-    @OnClick(R.id.show_cards)
+    @OnClick(R.id.start_game)
     public void onGameStart(){
         gameStarted = true;
 
@@ -146,11 +192,22 @@ public class GameActivity extends Activity {
         showCards.setVisibility(View.GONE);
         startGame.setVisibility(View.GONE);
 
-        takeCard.setVisibility(View.VISIBLE);
-        moveTrash.setVisibility(View.VISIBLE);
+        fromUnused.setVisibility(View.VISIBLE);
+        fromTable.setVisibility(View.VISIBLE);
         placeCard.setVisibility(View.VISIBLE);
 
-        for (int i = 0; i < noOfCardsPerPlayer; i++) {
+        Button btn = (Button) playerPanel.getChildAt(0);
+        int val = collectionPlayers.get(btn).intValue();
+
+        totalUnusedCards = totalNoOfCards - totalCardsDistributed;
+
+        for(int i=0;i<totalUnusedCards;i++) {
+            unusedCardsList.add(getNextCard());
+        }
+
+        unused.setText(totalUnusedCards + " cards");
+
+        for (int i = 0; i < val; i++) {
             ImageView card = new ImageView(getApplicationContext());
             String cardName = getNextCard();
             card.setImageResource(getNextCardImage(cardName));
@@ -171,15 +228,20 @@ public class GameActivity extends Activity {
 
     @OnClick(R.id.place_card)
     public void placeCard() {
-        for (int i = 0; i < selectedCardValue.size(); i++) {
-            Toast.makeText(this, selectedCardValue.get(i) + " OF " + selectedCardColor.get(i), Toast.LENGTH_SHORT).show();
-        }
+//        for (int i = 0; i < selectedCardValue.size(); i++) {
+//            Toast.makeText(this, selectedCardValue.get(i) + " OF " + selectedCardColor.get(i), Toast.LENGTH_SHORT).show();
+//        }
+
+
         selectedCardColor.clear();
         selectedCardValue.clear();
         for (ImageView v : selectedCardImages) {
             cardPanel.removeView(v);
+            centerContainer.addView(v);
+            centerCardCollection.add((String)v.getTag());
         }
         selectedCardImages.clear();
+
 
     }
 
@@ -187,6 +249,7 @@ public class GameActivity extends Activity {
         if (gameStarted) {
             return;
         }
+        ++totalCardsDistributed;
         int val = collectionPlayers.get(btn).intValue();
         ++val;
         collectionPlayers.remove(btn);
@@ -222,10 +285,21 @@ public class GameActivity extends Activity {
     private void selectCard(ImageView v) {
         String cardName = (String) v.getTag();
         String split[] = cardName.split("_");
-        selectedCardValue.add(split[0]);
-        selectedCardColor.add(split[split.length - 1]);
-        selectedCardImages.add(v);
+        if(selectedCardValue.contains(split[0]) && selectedCardColor.contains(split[split.length-1])){
+            deselectCard(v);
+            selectedCardValue.remove(split[0]);
+            selectedCardColor.remove(split[split.length-1]);
+            selectedCardImages.remove(v);
+        }
+        else{
+            selectedCardValue.add(split[0]);
+            selectedCardColor.add(split[split.length - 1]);
+            selectedCardImages.add(v);
+        }
+    }
 
+    private void deselectCard(ImageView v){
+        v.setTranslationY(mUiCtxt.dpToPx(0.0f));
     }
 
     private void distributeCards() {
