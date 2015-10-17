@@ -3,22 +3,28 @@ package com.enigma.deckofcards.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.enigma.deckofcards.R;
+import com.enigma.deckofcards.gameclass.CardColor;
+import com.enigma.deckofcards.gameclass.CardValue;
+import com.enigma.deckofcards.gameclass.Game;
+import com.enigma.deckofcards.gameclass.Place;
 import com.enigma.deckofcards.ui.LinearListLayout;
 import com.enigma.deckofcards.ui.UiContext;
 
 import java.util.ArrayList;
 
-import com.enigma.deckofcards.R;
-
 public class GameActivity extends Activity {
 
     final int TIME_ANIMATION_EXPAND_COLLAPSE = 500;
 
+    Game game_state;
+    String is_admin;
     Context mAppContext;
     UiContext mUiCtxt;
 
@@ -53,7 +59,11 @@ public class GameActivity extends Activity {
 
         setContentView(R.layout.game_main);
 
-
+        if (true) {
+            game_state = new Game(4, 0, true);
+        } else {
+            game_state = new Game(4, 1, false);
+        }
         player_1 = (Button) findViewById(R.id.player_1);
         player_2 = (Button) findViewById(R.id.player_2);
         player_3 = (Button) findViewById(R.id.player_3);
@@ -140,14 +150,21 @@ public class GameActivity extends Activity {
     }
 
     private void takeCards() {
-        Toast.makeText(this, "Take Cards: " + selected_player_index, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "Take Cards: " + selected_player_index, Toast.LENGTH_SHORT).show();
+
     }
 
     private void moveCards() {
         Toast.makeText(this, "Make Cards: " + selected_player_index, Toast.LENGTH_SHORT).show();
+        Log.e("game state", game_state.ConvertDeckToJsonString());
+        game_state.ChangeLocationOfCard(CardColor.DIAMOND, CardValue.A, Place.ARENA);
+        Log.e("game state", game_state.ConvertDeckToJsonString());
     }
 
     private void distribute_cards() {
         Toast.makeText(this, "Distribute Cards: " + selected_player_index, Toast.LENGTH_SHORT).show();
+        Log.e("game state", game_state.ConvertDeckToJsonString());
+        game_state.Distribute();
+        Log.e("game state", game_state.ConvertDeckToJsonString());
     }
 }

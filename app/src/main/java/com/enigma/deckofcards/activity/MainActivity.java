@@ -13,14 +13,13 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.enigma.deckofcards.R;
 import com.enigma.deckofcards.adapter.PlayerListAdapter;
 import com.enigma.deckofcards.ui.AdminPanelLayout;
 import com.enigma.deckofcards.ui.LinearListLayout;
 import com.enigma.deckofcards.ui.UiContext;
 
 import java.util.ArrayList;
-
-import com.enigma.deckofcards.R;
 
 public class MainActivity extends Activity {
 
@@ -114,6 +113,8 @@ public class MainActivity extends Activity {
 
     private void continue_game() {
         Intent intent = new Intent(this, GameActivity.class);
+        // Bundle extras = intent.getExtras();
+        // extras.putString("admin", "1");
         startActivity(intent);
     }
 
