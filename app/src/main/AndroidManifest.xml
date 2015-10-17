@@ -9,7 +9,6 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:screenOrientation="landscape"
-
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
@@ -24,6 +23,7 @@
         <activity
             android:name=".activity.GameActivity"
             android:label="Game"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape"></activity>
     </application>
 

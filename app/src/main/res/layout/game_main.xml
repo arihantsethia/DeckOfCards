@@ -43,9 +43,17 @@
     </HorizontalScrollView>
 
     <FrameLayout
+        android:id="@+id/hand_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentLeft="true"/>
+
+    <LinearLayout
         android:id="@+id/center_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_centerInParent="true"/>
 
     <Button
@@ -72,8 +80,7 @@
 
             <LinearLayout
                 android:id="@+id/card_panel"
-                android:layout_width="500dp"
-                android:layout_marginLeft="-30dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:orientation="horizontal" >
@@ -113,10 +120,17 @@
                 android:visibility="gone" />
 
             <Button
-                android:id="@+id/from_table"
+                android:id="@+id/from_table_to_deck"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="From Table"
+                android:text="Table To Deck"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/from_table_to_hand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Table To Hand"
                 android:visibility="gone" />
 
             <Button

@@ -39,7 +39,10 @@ public class GameActivity extends Activity {
     UiContext mUiCtxt;
 
     @InjectView(R.id.center_container)
-    FrameLayout centerContainer;
+    LinearLayout centerContainer;
+
+    @InjectView(R.id.hand_container)
+    FrameLayout handContainer;
 
     @InjectView(R.id.distribute)
     Button distribute;
@@ -56,8 +59,11 @@ public class GameActivity extends Activity {
     @InjectView(R.id.place_card)
     Button placeCard;
 
-    @InjectView(R.id.from_table)
-    Button fromTable;
+    @InjectView(R.id.from_table_to_deck)
+    Button fromTableToDeck;
+
+    @InjectView(R.id.from_table_to_hand)
+    Button fromTableToHand;
 
     @InjectView(R.id.btn_unused)
     Button unused;
@@ -139,8 +145,8 @@ public class GameActivity extends Activity {
         //TODO: Logic For Show Cards
     }
 
-    @OnClick(R.id.from_table)
-    public void onFromTable(){
+    @OnClick(R.id.from_table_to_deck)
+    public void onFromTableToDeck(){
         //TODO: Logic For Take Cards
         if(centerCardCollection.isEmpty())
             return;
@@ -152,6 +158,26 @@ public class GameActivity extends Activity {
             centerContainer.removeView(card);
             card.setTranslationY(0.0f);
             cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+        }
+
+        centerCardCollection.clear();
+    }
+
+    @OnClick(R.id.from_table_to_hand)
+    public void onFromTableToHand(){
+        //TODO: Logic For Take Cards
+        if(centerCardCollection.isEmpty())
+            return;
+
+        int childCount = centerContainer.getChildCount();
+
+        for(int i=0;i<childCount;i++){
+            ImageView card = (ImageView) centerContainer.getChildAt(0);
+            centerContainer.removeView(card);
+            card.setTranslationY(0.0f);
+            card.setTranslationX(0.0f);
+
+            handContainer.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
         }
 
         centerCardCollection.clear();
@@ -193,7 +219,8 @@ public class GameActivity extends Activity {
         startGame.setVisibility(View.GONE);
 
         fromUnused.setVisibility(View.VISIBLE);
-        fromTable.setVisibility(View.VISIBLE);
+        fromTableToDeck.setVisibility(View.VISIBLE);
+        fromTableToHand.setVisibility(View.VISIBLE);
         placeCard.setVisibility(View.VISIBLE);
 
         Button btn = (Button) playerPanel.getChildAt(0);
@@ -206,10 +233,18 @@ public class GameActivity extends Activity {
         }
 
         unused.setText(totalUnusedCards + " cards");
-
+        ImageView tempCard1 = new ImageView(getApplicationContext());
+        ImageView tempCard2 = new ImageView(getApplicationContext());
+        ImageView tempCard3 = new ImageView(getApplicationContext());
+        ImageView tempCard4 = new ImageView(getApplicationContext());
+        cardPanel.addView(tempCard1, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+        cardPanel.addView(tempCard2, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+        cardPanel.addView(tempCard3, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+        cardPanel.addView(tempCard4, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
         for (int i = 0; i < val; i++) {
             ImageView card = new ImageView(getApplicationContext());
             String cardName = getNextCard();
+//            Log.i(cardName, getNextCardImage(cardName) + "");
             card.setImageResource(getNextCardImage(cardName));
             card.setTag(cardName);
             if (card != null) {
@@ -238,6 +273,7 @@ public class GameActivity extends Activity {
         for (ImageView v : selectedCardImages) {
             cardPanel.removeView(v);
             centerContainer.addView(v);
+            v.setTranslationX((centerContainer.getChildCount()-1)*-mUiCtxt.dpToPx(40.0f));
             centerCardCollection.add((String)v.getTag());
         }
         selectedCardImages.clear();
@@ -264,9 +300,11 @@ public class GameActivity extends Activity {
         for (String el : Constant.CARD_IMAGE_NAMES) {
             tempCardsImageNames.add(el);
         }
+        Toast.makeText(this, "" + tempCardsImageNames.size(), Toast.LENGTH_SHORT).show();
     }
 
     private String getNextCard() {
+//        unused.setText(tempCardsImageNames.size() + "");
         Random rnd = new Random();
         int index = rnd.nextInt(tempCardsImageNames.size());
         String res_string = tempCardsImageNames.get(index);
