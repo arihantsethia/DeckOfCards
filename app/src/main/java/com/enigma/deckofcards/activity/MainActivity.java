@@ -165,8 +165,10 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @OnClick(R.id.btn_start)
     public void adminModeStartClick() {
+        if(gameName.getText().toString().isEmpty() || playerName.getText().toString().isEmpty())
+            return;
         role = Role.ADMIN;
-        updateBluetoothAdapterName("DeckOfCards", "Admin", role);
+        updateBluetoothAdapterName(gameName.getText().toString(), playerName.getText().toString(), role);
         initializePlayerList();
         Player player = new Player(mBluetoothManager.getDeviceName(), mBluetoothManager.getYourBtMacAddress(), playerCounter);
         if(!players.contains(player)) {
@@ -180,7 +182,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @OnClick(R.id.btn_continue)
     public void adminModeGameStartClick() {
-        continueGame("Admin");
+        continueGame();
     }
 
     @OnClick(R.id.btn_player)
@@ -188,13 +190,13 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
         if(gameName.getText().toString().isEmpty() || playerName.getText().toString().isEmpty())
             return;
         role = Role.PLAYER;
-        updateBluetoothAdapterName("DeckOfCards", "Player", role);
+        updateBluetoothAdapterName(gameName.getText().toString(), playerName.getText().toString(), role);
         setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);
         startDiscovery();
         scanAllBluetoothDevice();
     }
 
-    private void continueGame(String value) {
+    private void continueGame() {
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtra("ROLE", role);
         if(role == Role.ADMIN) {
