@@ -53,6 +53,8 @@ public class GameActivity extends BluetoothActivity {
     int totalCardsDistributed = 0;
     int totalUnusedCards = 0;
 
+    String backFace = "CARD_BACK_FACE";
+
     boolean gameStarted = false;
 
     Game gameState;
@@ -103,9 +105,6 @@ public class GameActivity extends BluetoothActivity {
     @InjectView(R.id.from_table_to_hand)
     Button fromTableToHand;
 
-    @InjectView(R.id.showCardCheck)
-    CheckBox showCardCheck;
-
 //    @InjectView(R.id.btn_unused)
 //    Button unused;
 
@@ -122,6 +121,7 @@ public class GameActivity extends BluetoothActivity {
     ArrayList<String> tempCardsImageNames;
 
     HashMap<View, Integer> collectionPlayers = new HashMap<View, Integer>();
+    HashMap<Player, View> playerViews = new HashMap<Player, View>();
     ArrayList<String> selectedCardValue = new ArrayList<String>();
     ArrayList<String> selectedCardColor = new ArrayList<String>();
     ArrayList<String> unusedCardsList = new ArrayList<String>();
@@ -148,8 +148,10 @@ public class GameActivity extends BluetoothActivity {
                 gameUBID = UUID.randomUUID().toString();
                 selectedPlayerList = intent.getParcelableArrayListExtra("PLAYERS");
                 connectToClients();
+                gameState = new Game(selectedPlayerList.size(), getMyListIndex(), (getMyListIndex() == 0));
                 createPlayerButtons();
             } else {
+                distribute.setVisibility(View.GONE);
                 admin = intent.getParcelableExtra("ADMIN");
                 connectToServer();
             }
@@ -164,6 +166,10 @@ public class GameActivity extends BluetoothActivity {
             if(resultCode == 500){
                 for(Player el : selectedPlayerList) {
                     int val = data.getIntExtra(el.getPlayerName(), 0);
+                    el.updateScore(val);
+                    String text = el.getPlayerName() + " : " + el.getPlayerScore();
+                    TextView tv = (TextView) playerViews.get(el).findViewById(R.id.text_playername);
+                    tv.setText(text);
                     Toast.makeText(this, el + " : " + val, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -181,10 +187,10 @@ public class GameActivity extends BluetoothActivity {
         }
     }
 
-    private View getPlayerView(String playerName){
+    private View getPlayerView(Player player){
         View v = getLayoutInflater().inflate(R.layout.player_view_layout, null);
         TextView tv = (TextView) v.findViewById(R.id.text_playername);
-        tv.setText(playerName);
+        tv.setText(player.getPlayerName() + " : " + player.getPlayerScore());
         return v;
     }
 
@@ -207,7 +213,12 @@ public class GameActivity extends BluetoothActivity {
 
     @OnClick(R.id.show_cards)
     public void onShowCards() {
-        //TODO: Logic For Show Cards
+        ArrayList<Card> cards = gameState.getDeck().GetCardForArena();
+        for (Card card : cards){
+            card.setVisibility(true);
+        }
+        sendMessage(MessageGenerator.getCurrentDeck(gameUBID, gameState));
+        updateUI();
     }
 
     @OnClick(R.id.btn_endGame)
@@ -228,6 +239,7 @@ public class GameActivity extends BluetoothActivity {
         ArrayList<Card> cards = gameState.getDeck().GetCardForArena();
 
         for(int i=0;i<cards.size();i++){
+            cards.get(i).setVisibility(false);
             String cardName = getCardName(cards.get(i).getCol(), cards.get(i).getVal());
             gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.D);
         }
@@ -246,6 +258,7 @@ public class GameActivity extends BluetoothActivity {
         ArrayList<Card> cards = gameState.getDeck().GetCardForArena();
 
         for(Card card: cards){
+            card.setVisibility(true);
             String cardName = getCardName(card.getCol(), card.getVal());
             gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.H);
         }
@@ -289,14 +302,14 @@ public class GameActivity extends BluetoothActivity {
         initializeCardImages();
 
         distribute.setVisibility(View.GONE);
-        showCards.setVisibility(View.GONE);
         startGame.setVisibility(View.GONE);
 
         fromUnused.setVisibility(View.VISIBLE);
         fromTableToDeck.setVisibility(View.VISIBLE);
         fromTableToHand.setVisibility(View.VISIBLE);
         placeCard.setVisibility(View.VISIBLE);
-        showCardCheck.setVisibility(View.VISIBLE);
+        showCards.setVisibility(View.VISIBLE);
+        //showCardCheck.setVisibility(View.VISIBLE);
 
         View btn =  playerPanel.getChildAt(0);
         int val = collectionPlayers.get(btn).intValue();
@@ -367,7 +380,11 @@ public class GameActivity extends BluetoothActivity {
             Card currentCard = cardsOfArena.get(i);
             ImageView card = new ImageView(getApplicationContext());
             String cardName = getCardName(currentCard.getCol(), currentCard.getVal());
-            card.setImageResource(getNextCardImage(cardName));
+            if(currentCard.getVisibility()) {
+                card.setImageResource(getNextCardImage(cardName));
+            }else{
+                card.setImageResource(getNextCardImage(backFace));
+            }
             card.setTag(cardName);
             Log.e("CardName", cardName);
             centerContainer.addView(card, (int)mUiCtxt.dpToPx(50.0f), (int)mUiCtxt.dpToPx(100.0f));
@@ -394,7 +411,6 @@ public class GameActivity extends BluetoothActivity {
     @OnClick(R.id.place_card)
     public void placeCard() {
 
-        String backFace = "CARD_BACK_FACE";
 
         selectedCardColor.clear();
         selectedCardValue.clear();
@@ -403,11 +419,11 @@ public class GameActivity extends BluetoothActivity {
             String cardName = (String) v.getTag();
             gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.A);
 
-            if(!showCardCheck.isChecked()) {
+            /*if(!showCardCheck.isChecked()) {
                 String tempName = (String) v.getTag();
                 v.setImageResource(getNextCardImage(backFace));
-            }
-                    cardPanel.removeView(v);
+            }*/
+            cardPanel.removeView(v);
             centerContainer.addView(v);
             v.setTranslationX((centerContainer.getChildCount()-1)*-mUiCtxt.dpToPx(40.0f));
             centerCardCollection.add((String)v.getTag());
@@ -425,9 +441,8 @@ public class GameActivity extends BluetoothActivity {
 
     private void createPlayerButtons(){
 
-        gameState = new Game(selectedPlayerList.size(), getMyListIndex(), (getMyListIndex() == 0));
         for (int i = 0; i < selectedPlayerList.size(); i++) {
-            View player = getPlayerView(selectedPlayerList.get(i).getPlayerName());
+            View player = getPlayerView(selectedPlayerList.get(i));
             player.setTag(i);
             if (player != null) {
                 player.setOnClickListener(new OnClickListener() {
@@ -440,6 +455,7 @@ public class GameActivity extends BluetoothActivity {
             }
             playerPanel.addView(player);
             collectionPlayers.put(player, 0);
+            playerViews.put(selectedPlayerList.get(i), player);
         }
     }
 
@@ -577,6 +593,7 @@ public class GameActivity extends BluetoothActivity {
                         lastHandledMessage = receivedMessageCounter;
                         selectedPlayerList = (new Gson()).fromJson(jsonObject.get("PlayerList").toString(), new TypeToken<ArrayList<Player>>() {
                         }.getType());
+                        gameState = new Game(selectedPlayerList.size(), getMyListIndex(), (getMyListIndex() == 0));
                         createPlayerButtons();
                     }
                 } else if (messageType == MessageType.Deck && gameUBID != null) {

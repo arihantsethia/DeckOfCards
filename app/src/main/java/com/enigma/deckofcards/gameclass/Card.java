@@ -7,6 +7,7 @@ public class Card {
     Card(CardColor color, CardValue value) {
         this.c = color;
         this.v = value;
+        this.b = false;
     }
     public Position getLocation() {
         return l;
@@ -29,6 +30,16 @@ public class Card {
     }
 
     CardValue v;
+
+    boolean b;
+
+    public boolean getVisibility(){
+        return b;
+    }
+
+    public void setVisibility(boolean visible){
+        b = visible;
+    }
 
 }
 

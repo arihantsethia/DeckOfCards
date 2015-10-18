@@ -5,7 +5,6 @@
     android:background="@color/black"
     tools:context="deck.of.cards.MainActivity" >
 
-
     <Button
         android:id="@+id/btn_score"
         android:layout_width="wrap_content"
@@ -25,29 +24,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal" >
-
-            <!--
-         <Button
-            android:id="@+id/player_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Player 1" />
-         <Button
-            android:id="@+id/player_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Player 2" />
-          <Button
-            android:id="@+id/player_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Player 3" />
-           <Button
-            android:id="@+id/player_4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Player 4" />
-            -->
 
         </LinearLayout>
     </HorizontalScrollView>
@@ -72,14 +48,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_centerInParent="true"/>
-
-   <!-- <Button
-        android:id="@+id/btn_unused"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerInParent="true"
-        android:text="Unused cards"/>-->
 
     <FrameLayout
         android:id="@+id/unused_container"
@@ -125,25 +93,10 @@
                 android:text="Distribute" />
 
             <Button
-                android:id="@+id/show_cards"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Show Cards" />
-
-            <Button
                 android:id="@+id/start_game"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Start Game" />
-
-            <CheckBox
-                android:id="@+id/showCardCheck"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Show Card"
-                android:textColor="@color/black"
-                android:background="@color/white"
-                android:textSize="10sp"/>
 
             <Button
                 android:id="@+id/place_card"
@@ -164,6 +117,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="To Hand"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/show_cards"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show Cards"
                 android:visibility="gone" />
 
             <Button

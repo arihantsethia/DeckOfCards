@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.enigma.deckofcards.Constant;
+import com.enigma.deckofcards.Player;
 import com.enigma.deckofcards.R;
 import com.enigma.deckofcards.ui.UiContext;
 
@@ -50,7 +51,7 @@ public class ScoreUpdateActivity extends Activity {
     @InjectView(R.id.btn_score_cancel)
     Button scoreCancel;
 
-    ArrayList<String> player_names;
+    ArrayList<Player> player_names;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +69,9 @@ public class ScoreUpdateActivity extends Activity {
         ButterKnife.inject(this);
 
         if(intent!=null){
-            player_names = intent.getStringArrayListExtra("PLAYERS");
-            for(String el : player_names) {
-                View v = getScoreView(el);
+            player_names = intent.getParcelableArrayListExtra("PLAYERS");
+            for(Player el : player_names) {
+                View v = getScoreView(el.getPlayerName());
                 playerScorePanel.addView(v);
             }
         }

@@ -8,14 +8,14 @@ import java.util.ArrayList;
 public class Deck {
     Card[] card_list;
     Deck() {
-        card_list = new Card[26];
+        card_list = new Card[52];
         int index = 0;
         for (CardColor cardColor : CardColor.values()) {
             for (CardValue cardValue : CardValue.values()) {
                 card_list[index] = new Card(cardColor, cardValue);
                 ++index;
             }
-            if (index == 26) {
+            if (index == 52) {
                 break;
             }
         }
