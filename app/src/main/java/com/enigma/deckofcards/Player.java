@@ -65,6 +65,10 @@ public class Player implements Parcelable {
         return playerAddress;
     }
 
+    public String getGameName() {
+        return playerDeviceName.split(":")[0].trim();
+    }
+
     public String getPlayerName(){
         return playerDeviceName.split(":")[1].trim();
     }

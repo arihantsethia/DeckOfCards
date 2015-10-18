@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.enigma.deckofcards.Constant;
+import com.enigma.deckofcards.Player;
 import com.enigma.deckofcards.Role;
 import com.enigma.deckofcards.bluetooth.mananger.BluetoothManager;
 import com.enigma.deckofcards.bus.BluetoothCommunicator;
@@ -57,12 +58,12 @@ public abstract class BluetoothActivity extends AppCompatActivity {
         }
     }
 
-    protected boolean isRelevantDevice(BluetoothDevice device) {
-        return (device.getName() != null) && (device.getName().startsWith(mBluetoothManager.getGameName()));
+    protected boolean isRelevantPlayer(Player player) {
+        return (player.getPlayerDeviceName() != null) && (player.getGameName().equals(mBluetoothManager.getGameName()));
     }
 
-    protected boolean isAdmin(BluetoothDevice device){
-        return (device.getName() != null) && (device.getName().contains(Role.ADMIN.name()));
+    protected boolean isAdminPlayer(Player player){
+        return (player.getPlayerDeviceName() != null) && (player.getRole() == Role.ADMIN);
     }
 
 

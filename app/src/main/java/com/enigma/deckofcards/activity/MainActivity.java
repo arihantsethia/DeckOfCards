@@ -94,10 +94,11 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     @Override
     public void onBluetoothDeviceFound(BluetoothDevice device) {
         if (role != null){
-            if(isRelevantDevice(device)) {
+            Player player = new Player(device.getName(), device.getAddress(), playerCounter);
+            if(isRelevantPlayer(player)) {
                 if(role == Role.ADMIN) {
                     Log.d(Constant.LOG_TAG, device.getName());
-                    Player player = new Player(device.getName(), device.getAddress(), playerCounter);
+
                     if(!players.contains(player)) {
                         playerCounter++;
                         players.add(player);
@@ -107,7 +108,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
                     }
                 }else if (role == Role.PLAYER){
                     Log.d(Constant.LOG_TAG, device.getName());
-                    if(isAdmin(device)){
+                    if(isAdminPlayer(player)){
                         admin = new Player(device.getName(), device.getAddress(), playerCounter++);
                         btnContinue.setEnabled(true);
                     }
@@ -264,7 +265,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     @Override
     public void onPerformPlayerSelect(Player player) {
         selectedPlayerList.add(player);
-        btnContinue.setEnabled(selectedPlayerList.size()>1);
+        btnContinue.setEnabled(selectedPlayerList.size() > 1);
         Toast.makeText(this, player.getPlayerName(), Toast.LENGTH_SHORT).show();
     }
 
@@ -272,7 +273,7 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
     public void onPerformPlayerDeselect(Player player) {
         if (selectedPlayerList.contains(player)) {
             selectedPlayerList.remove(player);
-            btnContinue.setEnabled(selectedPlayerList.size()>1);
+            btnContinue.setEnabled(selectedPlayerList.size() > 1);
             Toast.makeText(this, player.getPlayerName(), Toast.LENGTH_SHORT).show();
         }
     }
