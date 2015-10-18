@@ -51,4 +51,34 @@ public class MessageGenerator {
         }
         return message;
     }
+
+    public static String getPlayersUpdateMessage(String gameUBID, ArrayList<Player> players){
+        String message = "";
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("GameUBID", gameUBID);
+            jsonObject.put("MessageType", MessageType.UpdatePlayer);
+            jsonObject.put("MessageCounter", counter++);
+            jsonObject.put("PlayerList", (new Gson()).toJson(players, new TypeToken<ArrayList<Player>>() {
+            }.getType()));
+            message = jsonObject.toString();
+        }catch (JSONException e) {
+            Log.e(Constant.LOG_TAG, e.getMessage());
+        }
+        return message;
+    }
+
+    public static String getGameResetMessage(String gameUBID, ArrayList<Player> players){
+        String message = "";
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("GameUBID", gameUBID);
+            jsonObject.put("MessageType", MessageType.ResetGame);
+            jsonObject.put("MessageCounter", counter++);
+            message = jsonObject.toString();
+        }catch (JSONException e) {
+            Log.e(Constant.LOG_TAG, e.getMessage());
+        }
+        return message;
+    }
 }
