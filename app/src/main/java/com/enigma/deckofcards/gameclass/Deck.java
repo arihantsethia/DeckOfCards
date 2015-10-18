@@ -8,12 +8,15 @@ import java.util.ArrayList;
 public class Deck {
     Card[] card_list;
     Deck() {
-        card_list = new Card[52];
+        card_list = new Card[26];
         int index = 0;
         for (CardColor cardColor : CardColor.values()) {
             for (CardValue cardValue : CardValue.values()) {
                 card_list[index] = new Card(cardColor, cardValue);
                 ++index;
+            }
+            if (index == 26) {
+                break;
             }
         }
     }
@@ -29,10 +32,19 @@ public class Deck {
     public ArrayList<Card> GetCardForPlayer(int player_index) {
         ArrayList<Card> cards = new ArrayList<Card>();
         for (Card card : card_list) {
-            if (card.location.getPosition() == Place.PLAYER_HAND) {
-                if (card.location.getPlayer_index() == player_index) {
+            if (card.l.getPosition() == Place.D || card.l.getPosition() == Place.H) {
+                if (card.l.getPlayer_index() == player_index) {
                     cards.add(0, card);
                 }
+            }
+        }
+        return cards;
+    }
+    public ArrayList<Card> GetCardForArena() {
+        ArrayList<Card> cards = new ArrayList<Card>();
+        for (Card card : card_list) {
+            if (card.l.getPosition() == Place.A) {
+                cards.add(0, card);
             }
         }
         return cards;

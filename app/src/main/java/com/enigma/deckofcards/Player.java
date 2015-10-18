@@ -28,7 +28,6 @@ public class Player implements Parcelable {
         return identifier;
     }
 
-
     public String getPlayerDeviceName(){
         return playerDeviceName;
     }

@@ -5,40 +5,30 @@ package com.enigma.deckofcards.gameclass;
  */
 public class Card {
     Card(CardColor color, CardValue value) {
-        this.color = color;
-        this.value = value;
+        this.c = color;
+        this.v = value;
     }
     public Position getLocation() {
-        return location;
+        return l;
     }
 
     public void setLocation(Position current_location) {
-        this.location = current_location;
+        this.l = current_location;
     }
 
-    Position location;
+    Position l;
 
-    public CardColor getColor() {
-        return color;
+    public CardColor getCol() {
+        return c;
     }
 
-    CardColor color;
+    CardColor c;
 
-    public CardValue getValue() {
-        return value;
+    public CardValue getVal() {
+        return v;
     }
 
-    CardValue value;
-
-    public boolean isVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
-    }
-
-    boolean visibility;
+    CardValue v;
 
 }
 

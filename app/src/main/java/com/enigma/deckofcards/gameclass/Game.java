@@ -42,16 +42,16 @@ public class Game {
     }
 
     public boolean Distribute() {
-        if (this.current_player != this.admin_index) {
+        /*if (this.current_player != this.admin_index) {
             return false;
-        }
-        int[] shuffle = new int[52];
-        for (int i = 0; i < 52; ++i) {
+        }*/
+        int[] shuffle = new int[26];
+        for (int i = 0; i < 26; ++i) {
             shuffle[i] = i;
         }
         shuffleArray(shuffle);
-        for (int i = 0; i < 52; ++i) {
-            whole_deck.ChangeCardLocation(shuffle[i], Place.PLAYER_HAND, i%no_of_players);
+        for (int i = 0; i < 26; ++i) {
+            whole_deck.ChangeCardLocation(shuffle[i], Place.D, i%no_of_players);
         }
         return true;
     }

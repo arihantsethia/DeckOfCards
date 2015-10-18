@@ -21,6 +21,12 @@ import com.enigma.deckofcards.MessageType;
 import com.enigma.deckofcards.Player;
 import com.enigma.deckofcards.R;
 import com.enigma.deckofcards.Role;
+import com.enigma.deckofcards.gameclass.Card;
+import com.enigma.deckofcards.gameclass.CardColor;
+import com.enigma.deckofcards.gameclass.CardValue;
+import com.enigma.deckofcards.gameclass.Deck;
+import com.enigma.deckofcards.gameclass.Game;
+import com.enigma.deckofcards.gameclass.Place;
 import com.enigma.deckofcards.ui.UiContext;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -28,6 +34,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
@@ -46,6 +53,8 @@ public class GameActivity extends BluetoothActivity {
 
     boolean gameStarted = false;
 
+    Game gameState;
+
     Context mAppContext;
     UiContext mUiCtxt;
     Role role;
@@ -53,6 +62,7 @@ public class GameActivity extends BluetoothActivity {
     ArrayList<Player> selectedPlayerList;
     String gameUBID = null;
     int lastHandledMessage = -1;
+    String bMsg="";
 
 
     @InjectView(R.id.center_container)
@@ -120,12 +130,12 @@ public class GameActivity extends BluetoothActivity {
 
         if (intent != null) {
             role = (Role) intent.getSerializableExtra("ROLE");
-            if(role == Role.ADMIN){
+            if (role == Role.ADMIN) {
                 gameUBID = UUID.randomUUID().toString();
                 selectedPlayerList = intent.getParcelableArrayListExtra("PLAYERS");
                 connectToClients();
                 createPlayerButtons();
-            }else{
+            } else {
                 admin = intent.getParcelableExtra("ADMIN");
                 connectToServer();
             }
@@ -141,10 +151,14 @@ public class GameActivity extends BluetoothActivity {
             collectionPlayers.remove(btn);
             collectionPlayers.put(btn, noOfCardsPerPlayer);
             int tag = ((Integer) btn.getTag()).intValue();
-            String text = selectedPlayerList.get(tag) + " (" + noOfCardsPerPlayer + ")";
+            String text = selectedPlayerList.get(tag).getPlayerName() + " (" + noOfCardsPerPlayer + ")";
             btn.setText(text);
         }
         totalCardsDistributed = 52;
+        Log.e("bef dest", gameState.ConvertDeckToJsonString());
+        gameState.Distribute();
+        Log.e("distribution", "done");
+        Log.e("aft dest", gameState.ConvertDeckToJsonString());
     }
 
     @OnClick(R.id.show_cards)
@@ -155,19 +169,28 @@ public class GameActivity extends BluetoothActivity {
     @OnClick(R.id.from_table_to_deck)
     public void onFromTableToDeck(){
         //TODO: Logic For Take Cards
-        if(centerCardCollection.isEmpty())
-            return;
+     //   if(centerCardCollection.isEmpty())
+     //       return;
 
-        int childCount = centerContainer.getChildCount();
+        // int childCount = centerContainer.getChildCount();
+        ArrayList<Card> cards = gameState.getDeck().GetCardForArena();
 
-        for(int i=0;i<childCount;i++){
-            ImageView card = (ImageView) centerContainer.getChildAt(0);
-            centerContainer.removeView(card);
+        for(int i=0;i<cards.size();i++){
+            // ImageView card = (ImageView) centerContainer.getChildAt(0);
+            /*centerContainer.removeView(card);
             card.setTranslationY(0.0f);
             cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+            String cardName = (String) card.getTag();
+            gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.PLAYER_DECK);
+            */
+            // ImageView card = (ImageView) cards.getChildAt(0);
+            String cardName = getCardName(cards.get(i).getCol(), cards.get(i).getVal());
+            gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.D);
         }
-
-        centerCardCollection.clear();
+        sendMessage(MessageGenerator.getCurrentDeck(gameUBID, gameState));
+        //if(role == Role.ADMIN)
+            updateUI();
+     //   centerCardCollection.clear();
     }
 
     @OnClick(R.id.from_table_to_hand)
@@ -176,18 +199,31 @@ public class GameActivity extends BluetoothActivity {
         if(centerCardCollection.isEmpty())
             return;
 
-        int childCount = centerContainer.getChildCount();
+        // int childCount = centerContainer.getChildCount();
 
-        for(int i=0;i<childCount;i++){
+        ArrayList<Card> cards = gameState.getDeck().GetCardForArena();
+
+        for(Card card: cards){
+            String cardName = getCardName(card.getCol(), card.getVal());
+            gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.H);
+        }
+
+        sendMessage(MessageGenerator.getCurrentDeck(gameUBID, gameState));
+        //if(role == Role.ADMIN)
+        updateUI();
+
+        /*for(int i=0;i<childCount;i++){
             ImageView card = (ImageView) centerContainer.getChildAt(0);
             centerContainer.removeView(card);
             card.setTranslationY(0.0f);
             card.setTranslationX(0.0f);
 
             handContainer.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+            String cardName = (String) card.getTag();
+            gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.H);
         }
 
-        centerCardCollection.clear();
+        centerCardCollection.clear();*/
     }
 
     @OnClick(R.id.from_unused)
@@ -248,40 +284,152 @@ public class GameActivity extends BluetoothActivity {
         cardPanel.addView(tempCard2, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
         cardPanel.addView(tempCard3, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
         cardPanel.addView(tempCard4, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
-        for (int i = 0; i < val; i++) {
+
+        sendMessage(MessageGenerator.getCurrentDeck(gameUBID, gameState));
+        // if(role == Role.ADMIN)
+            updateUI();
+    }
+    private void ShowCardsForPlayer(int index) {
+        Log.e("Calling Show for Player", "yes" + Integer.toString(index));
+        cardPanel.removeAllViews();
+        ArrayList<Card> cardsOfCurrentPlayer = gameState.getDeck().GetCardForPlayer(index);
+        for (int i = 0; i < cardsOfCurrentPlayer.size(); i++) {
+            Card currentCard = cardsOfCurrentPlayer.get(i);
             ImageView card = new ImageView(getApplicationContext());
-            String cardName = getNextCard();
-//            Log.i(cardName, getNextCardImage(cardName) + "");
+            String cardName = getCardName(currentCard.getCol(), currentCard.getVal());
             card.setImageResource(getNextCardImage(cardName));
             card.setTag(cardName);
-            if (card != null) {
-                card.setOnClickListener(new OnClickListener() {
+            Log.e("CardName", cardName);
+            if(currentCard.getLocation().getPosition() == Place.D) {
+                if (card != null) {
+                    card.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            v.setTranslationY(-mUiCtxt.dpToPx(10.0f));
+                            selectCard((ImageView) v);
+                        }
+                    });
+                }
+                cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+            }
+            else {
+                card.setTranslationY(0.0f);
+                card.setTranslationX(0.0f);
+                handContainer.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+            }
+        }
 
+         /*for(int i=0;i<childCount;i++){
+            ImageView card = (ImageView) centerContainer.getChildAt(0);
+            centerContainer.removeView(card);
+            card.setTranslationY(0.0f);
+            card.setTranslationX(0.0f);
+
+            handContainer.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+            String cardName = (String) card.getTag();
+            gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.H);
+        }
+
+        centerCardCollection.clear();*/
+
+    }
+
+    private void ShowCardsForArena() {
+        Log.e("Calling Show for Arena", "yes");
+        centerContainer.removeAllViews();
+        centerCardCollection.clear();
+        ArrayList<Card> cardsOfArena = gameState.getDeck().GetCardForArena();
+        // for (ImageView v : selectedCardImages) {
+        //     cardPanel.removeView(v);
+        //     centerContainer.addView(v);
+        //     v.setTranslationX((centerContainer.getChildCount() - 1) * -mUiCtxt.dpToPx(40.0f));
+        //     String cardName = (String) v.getTag();
+        //     centerCardCollection.add(cardName);
+        //     gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.ARENA);
+        // }
+        for (int i = 0; i < cardsOfArena.size(); i++) {
+            Card currentCard = cardsOfArena.get(i);
+            ImageView card = new ImageView(getApplicationContext());
+            String cardName = getCardName(currentCard.getCol(), currentCard.getVal());
+            card.setImageResource(getNextCardImage(cardName));
+            card.setTag(cardName);
+            Log.e("CardName", cardName);
+            /*if (card != null) {
+                card.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         v.setTranslationY(-mUiCtxt.dpToPx(10.0f));
                         selectCard((ImageView) v);
                     }
                 });
-            }
-            cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
+            }*/
+            centerContainer.addView(card, (int)mUiCtxt.dpToPx(50.0f), (int)mUiCtxt.dpToPx(100.0f));
+            card.setTranslationX((centerContainer.getChildCount() - 1) * -mUiCtxt.dpToPx(40.0f));
+            centerCardCollection.add(cardName);
         }
+    }
+    private static final String[] cardColors = {"DIAMONDS", "HEARTS", "SPADES", "CLUBS"};
+    private static final String[] cardValues = {"ACE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "JACK", "KING", "QUEEN"};
+    private String getCardName(CardColor cardColor, CardValue cardValue) {
+        return cardValues[cardValue.ordinal()] + "_OF_" + cardColors[cardColor.ordinal()];
+    }
+    private  CardValue getCardValue(String cardName) {
+        String cv = cardName.substring(0, cardName.indexOf('_'));
+        int ord = Arrays.asList(cardValues).indexOf(cv);
+        return CardValue.values()[ord];
+    }
+    private  CardColor getCardColor(String cardName) {
+        String cc = cardName.substring(cardName.indexOf('_')+4);
+        int ord = Arrays.asList(cardColors).indexOf(cc);
+        return CardColor.values()[ord];
     }
 
     @OnClick(R.id.place_card)
     public void placeCard() {
         selectedCardColor.clear();
         selectedCardValue.clear();
+        Log.e("before deck", gameState.ConvertDeckToJsonString());
         for (ImageView v : selectedCardImages) {
-            cardPanel.removeView(v);
-            centerContainer.addView(v);
-            v.setTranslationX((centerContainer.getChildCount()-1)*-mUiCtxt.dpToPx(40.0f));
-            centerCardCollection.add((String)v.getTag());
+            String cardName = (String) v.getTag();
+            gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.A);
         }
+        sendMessage(MessageGenerator.getCurrentDeck(gameUBID, gameState));
+        // if(role == Role.ADMIN)
+            updateUI();
+       // for (ImageView v : selectedCardImages) {
+       //     cardPanel.removeView(v);
+       //     centerContainer.addView(v);
+       //     v.setTranslationX((centerContainer.getChildCount() - 1) * -mUiCtxt.dpToPx(40.0f));
+       //     String cardName = (String) v.getTag();
+       //     centerCardCollection.add(cardName);
+       //     gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.ARENA);
+       // }
+        Log.e("after deck", gameState.ConvertDeckToJsonString());
         selectedCardImages.clear();
     }
 
     private void createPlayerButtons(){
+        /*for (int i = 0; i < selectedPlayerList.size(); i++) {
+            Button player = new Button(this);
+            player.setText(selectedPlayerList.get(i).getPlayerName());
+            player.setTag(i);
+            if (player != null) {
+                player.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        giveCards((Button) v);
+                    }
+                });
+            }
+            playerPanel.addView(player);
+            collectionPlayers.put(player, 0);
+        }*/
+        /*selectedPlayerList = new ArrayList<String>();
+        selectedPlayerList.add(0, "P1");
+        selectedPlayerList.add(1, "P2");
+        selectedPlayerList.add(2, "P3");
+        selectedPlayerList.add(3, "P4");*/
+        gameState = new Game(selectedPlayerList.size(), getMyListIndex(), (getMyListIndex() == 0));
         for (int i = 0; i < selectedPlayerList.size(); i++) {
             Button player = new Button(this);
             player.setText(selectedPlayerList.get(i).getPlayerName());
@@ -416,13 +564,15 @@ public class GameActivity extends BluetoothActivity {
         actOnMessage(messageReceive);
     }
 
-    private void actOnMessage(String message){
+    private void actOnMessage(String message) {
+        bMsg+=message;
         try {
-            JSONObject jsonObject = new JSONObject(message);
+            Log.e("act on", bMsg);
+            JSONObject jsonObject = new JSONObject(bMsg);
             MessageType messageType = MessageType.valueOf(jsonObject.getString("MessageType"));
             int receivedMessageCounter = jsonObject.getInt("MessageCounter");
             String receivedGameUBID = jsonObject.getString("GameUBID");
-            if(lastHandledMessage < receivedMessageCounter && (gameUBID == null || gameUBID == receivedGameUBID)) {
+            if(lastHandledMessage < receivedMessageCounter && (gameUBID == null || gameUBID.equals(receivedGameUBID))) {
                 if (messageType == MessageType.PlayerList) {
                     if (role == Role.PLAYER && gameUBID == null) {
                         gameUBID = receivedGameUBID;
@@ -433,9 +583,11 @@ public class GameActivity extends BluetoothActivity {
                     }
                 } else if (messageType == MessageType.Deck && gameUBID != null) {
                     lastHandledMessage = receivedMessageCounter;
-                    //TODO:
+                    gameState.updateDeckfromJson(jsonObject.get("Deck").toString());
+                    updateUI();
                 }
             }
+            bMsg="";
         } catch(Exception e){
             Log.e(Constant.LOG_TAG, e.getMessage());
         }
@@ -444,5 +596,19 @@ public class GameActivity extends BluetoothActivity {
     @Override
     public void onBluetoothNotAvailable() {
 
+    }
+
+    private void updateUI(){
+        ShowCardsForArena();
+        ShowCardsForPlayer(getMyListIndex());
+    }
+
+    private int getMyListIndex(){
+        for(int i=0;i<selectedPlayerList.size();i++){
+            if(mBluetoothManager.getYourBtMacAddress().equals(selectedPlayerList.get(i).getPlayerAddress())) {
+                return selectedPlayerList.get(i).getIdentifier();
+            }
+        }
+        return -1;
     }
 }

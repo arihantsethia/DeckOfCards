@@ -2,6 +2,8 @@ package com.enigma.deckofcards;
 
 import android.util.Log;
 
+import com.enigma.deckofcards.gameclass.Deck;
+import com.enigma.deckofcards.gameclass.Game;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -34,7 +36,19 @@ public class MessageGenerator {
         return message;
     }
 
-    public static String getCurrentDeck(String gameUBID){
-        return "";
+    public static String getCurrentDeck(String gameUBID, Game game){
+        String message = "";
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("GameUBID", gameUBID);
+            jsonObject.put("MessageType", MessageType.Deck);
+            jsonObject.put("MessageCounter", counter++);
+            jsonObject.put("Deck", game.ConvertDeckToJsonString());
+            message = jsonObject.toString();
+            Log.e("msg gen", message);
+        }catch (JSONException e) {
+            Log.e(Constant.LOG_TAG, e.getMessage());
+        }
+        return message;
     }
 }

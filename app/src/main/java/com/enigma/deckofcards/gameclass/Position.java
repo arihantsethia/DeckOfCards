@@ -4,26 +4,26 @@ package com.enigma.deckofcards.gameclass;
  * Created by sparshs on 10/17/15.
  */
 public class Position {
-    Place position;
-    int player_index;
+    Place p;
+    int i;
     public boolean setPosition(Place current_position, int index) {
-        if (current_position == Place.PLAYER_HAND || current_position == Place.PLAYER_DECK) {
+        if (current_position == Place.H || current_position == Place.D) {
             if (index == -1) {
                 return false;
             } else {
-                position = current_position;
-                player_index = index;
+                p = current_position;
+                i = index;
                 return true;
             }
         } else {
-            position = current_position;
+            p = current_position;
             return true;
         }
     }
     public Place getPosition() {
-        return position;
+        return p;
     }
     public int getPlayer_index() {
-        return player_index;
+        return i;
     }
 }

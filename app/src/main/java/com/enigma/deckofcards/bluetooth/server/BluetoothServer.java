@@ -44,7 +44,7 @@ public class BluetoothServer implements Runnable {
             mInputStream = mSocket.getInputStream();
             mOutputStreamWriter = new OutputStreamWriter(mSocket.getOutputStream());
 
-            int bufferSize = 1024;
+            int bufferSize = 1024*1024;
             int bytesRead = -1;
             byte[] buffer = new byte[bufferSize];
 
