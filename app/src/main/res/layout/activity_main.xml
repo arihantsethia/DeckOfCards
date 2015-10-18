@@ -2,8 +2,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@color/white"
     tools:context="com.enigma.deckofcards.MainActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Game Name "
+            android:textColor="@color/black"/>
+    <EditText
+        android:id="@+id/game_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Game Name"/>
+    </LinearLayout>
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentRight="true">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter Player Name "
+            android:textColor="@color/black"/>
+    <EditText
+        android:id="@+id/player_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Player Name"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,6 +83,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:orientation="vertical"></com.enigma.deckofcards.ui.LinearListLayout>
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> Latest UI Changes V-3
         </com.enigma.deckofcards.ui.AdminPanelLayout>
 
         <Button
@@ -69,7 +105,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:background="@color/green"
+<<<<<<< HEAD
             android:enabled="false"
+=======
+>>>>>>> Latest UI Changes V-3
             android:text="CONTINUE" />
     </LinearLayout>
 

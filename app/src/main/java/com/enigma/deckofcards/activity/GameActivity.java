@@ -9,10 +9,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.enigma.deckofcards.Constant;
@@ -71,6 +73,9 @@ public class GameActivity extends BluetoothActivity {
     @InjectView(R.id.hand_container)
     FrameLayout handContainer;
 
+    @InjectView(R.id.unused_container)
+    FrameLayout unusedContainer;
+
     @InjectView(R.id.distribute)
     Button distribute;
 
@@ -89,11 +94,20 @@ public class GameActivity extends BluetoothActivity {
     @InjectView(R.id.from_table_to_deck)
     Button fromTableToDeck;
 
+    @InjectView(R.id.btn_score)
+    Button scoreUpdate;
+
+    @InjectView(R.id.btn_endGame)
+    Button btnEndGame;
+
     @InjectView(R.id.from_table_to_hand)
     Button fromTableToHand;
 
-    @InjectView(R.id.btn_unused)
-    Button unused;
+    @InjectView(R.id.showCardCheck)
+    CheckBox showCardCheck;
+
+//    @InjectView(R.id.btn_unused)
+//    Button unused;
 
     @InjectView(R.id.player_panel)
     LinearLayout playerPanel;
@@ -142,17 +156,50 @@ public class GameActivity extends BluetoothActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 100){
+            if(resultCode == 500){
+                for(Player el : selectedPlayerList) {
+                    int val = data.getIntExtra(el.getPlayerName(), 0);
+                    Toast.makeText(this, el + " : " + val, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if(resultCode == 600){
+                Toast.makeText(this, "Cancel", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if(requestCode == 200){
+            if(resultCode == 500){
+                boolean finish = data.getBooleanExtra("END_GAME", false);
+                Toast.makeText(this, "End game : " + finish, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private View getPlayerView(String playerName){
+        View v = getLayoutInflater().inflate(R.layout.player_view_layout, null);
+        TextView tv = (TextView) v.findViewById(R.id.text_playername);
+        tv.setText(playerName);
+        return v;
+    }
+
     @OnClick(R.id.distribute)
     public void onDistributeCards() {
         noOfCardsPerPlayer = totalNoOfCards / collectionPlayers.size();
         Set<Button> set = collectionPlayers.keySet();
         for (int i = 0; i < playerPanel.getChildCount(); i++) {
-            Button btn = (Button) playerPanel.getChildAt(i);
+            View btn = playerPanel.getChildAt(i);
             collectionPlayers.remove(btn);
             collectionPlayers.put(btn, noOfCardsPerPlayer);
             int tag = ((Integer) btn.getTag()).intValue();
             String text = selectedPlayerList.get(tag).getPlayerName() + " (" + noOfCardsPerPlayer + ")";
-            btn.setText(text);
+            TextView tv = (TextView) btn.findViewById(R.id.text_playername);
+            tv.setText(text);
         }
         totalCardsDistributed = 52;
         Log.e("bef dest", gameState.ConvertDeckToJsonString());
@@ -166,31 +213,29 @@ public class GameActivity extends BluetoothActivity {
         //TODO: Logic For Show Cards
     }
 
+    @OnClick(R.id.btn_endGame)
+    public void onEndGame() {
+        Intent intent = new Intent(this, EndGameActivity.class);
+        startActivityForResult(intent, 200);
+    }
+
+    @OnClick(R.id.btn_score)
+    public void onScoreUpdate() {
+        Intent intent = new Intent(this, ScoreUpdateActivity.class);
+        intent.putStringArrayListExtra("PLAYERS", selectedPlayerList);
+        startActivityForResult(intent, 100);
+    }
+
     @OnClick(R.id.from_table_to_deck)
     public void onFromTableToDeck(){
-        //TODO: Logic For Take Cards
-     //   if(centerCardCollection.isEmpty())
-     //       return;
-
-        // int childCount = centerContainer.getChildCount();
         ArrayList<Card> cards = gameState.getDeck().GetCardForArena();
 
         for(int i=0;i<cards.size();i++){
-            // ImageView card = (ImageView) centerContainer.getChildAt(0);
-            /*centerContainer.removeView(card);
-            card.setTranslationY(0.0f);
-            cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
-            String cardName = (String) card.getTag();
-            gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.PLAYER_DECK);
-            */
-            // ImageView card = (ImageView) cards.getChildAt(0);
             String cardName = getCardName(cards.get(i).getCol(), cards.get(i).getVal());
             gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.D);
         }
         sendMessage(MessageGenerator.getCurrentDeck(gameUBID, gameState));
-        //if(role == Role.ADMIN)
-            updateUI();
-     //   centerCardCollection.clear();
+        updateUI();
     }
 
     @OnClick(R.id.from_table_to_hand)
@@ -209,21 +254,7 @@ public class GameActivity extends BluetoothActivity {
         }
 
         sendMessage(MessageGenerator.getCurrentDeck(gameUBID, gameState));
-        //if(role == Role.ADMIN)
         updateUI();
-
-        /*for(int i=0;i<childCount;i++){
-            ImageView card = (ImageView) centerContainer.getChildAt(0);
-            centerContainer.removeView(card);
-            card.setTranslationY(0.0f);
-            card.setTranslationX(0.0f);
-
-            handContainer.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
-            String cardName = (String) card.getTag();
-            gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.H);
-        }
-
-        centerCardCollection.clear();*/
     }
 
     @OnClick(R.id.from_unused)
@@ -231,12 +262,7 @@ public class GameActivity extends BluetoothActivity {
         if(unusedCardsList.isEmpty())
             return;
 
-        String cardName = unusedCardsList.get(0);
-        --totalUnusedCards;
-        unusedCardsList.remove(0);
-        ImageView card = new ImageView(getApplicationContext());
-        card.setImageResource(getNextCardImage(cardName));
-        card.setTag(cardName);
+        ImageView card = getCardFromUnused();
         if (card != null) {
             card.setOnClickListener(new OnClickListener() {
 
@@ -248,7 +274,16 @@ public class GameActivity extends BluetoothActivity {
             });
         }
         cardPanel.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
-        unused.setText(totalUnusedCards + " cards");
+//        unused.setText(totalUnusedCards + " cards");
+    }
+
+    private ImageView getCardFromUnused(){
+        String cardName = unusedCardsList.get(unusedCardsList.size()-1);
+        --totalUnusedCards;
+        unusedCardsList.remove(unusedCardsList.size()-1);
+        ImageView v = (ImageView)unusedContainer.findViewWithTag(cardName);
+        unusedContainer.removeView(v);
+        return v;
     }
 
     @OnClick(R.id.start_game)
@@ -266,16 +301,22 @@ public class GameActivity extends BluetoothActivity {
         fromTableToHand.setVisibility(View.VISIBLE);
         placeCard.setVisibility(View.VISIBLE);
 
-        Button btn = (Button) playerPanel.getChildAt(0);
+        View btn =  playerPanel.getChildAt(0);
         int val = collectionPlayers.get(btn).intValue();
 
         totalUnusedCards = totalNoOfCards - totalCardsDistributed;
 
         for(int i=0;i<totalUnusedCards;i++) {
-            unusedCardsList.add(getNextCard());
+            String cardName = getNextCard();
+            unusedCardsList.add(cardName);
+            ImageView card = new ImageView(getApplicationContext());
+            card.setImageResource(getNextCardImage(cardName));
+            card.setTag(cardName);
+
+            unusedContainer.addView(card, (int) mUiCtxt.dpToPx(50.0f), (int) mUiCtxt.dpToPx(100.0f));
         }
 
-        unused.setText(totalUnusedCards + " cards");
+//        unused.setText(totalUnusedCards + " cards");
         ImageView tempCard1 = new ImageView(getApplicationContext());
         ImageView tempCard2 = new ImageView(getApplicationContext());
         ImageView tempCard3 = new ImageView(getApplicationContext());
@@ -386,12 +427,30 @@ public class GameActivity extends BluetoothActivity {
 
     @OnClick(R.id.place_card)
     public void placeCard() {
+
+        String backFace = "CARD_BACK_FACE";
+
         selectedCardColor.clear();
         selectedCardValue.clear();
         Log.e("before deck", gameState.ConvertDeckToJsonString());
         for (ImageView v : selectedCardImages) {
             String cardName = (String) v.getTag();
             gameState.ChangeLocationOfCard(getCardColor(cardName), getCardValue(cardName), Place.A);
+
+            if(!showCardCheck.isChecked()) {
+                String tempName = (String) v.getTag();
+                v.setImageResource(getNextCardImage(backFace));
+            }
+                    cardPanel.removeView(v);
+            centerContainer.addView(v);
+            v.setTranslationX((centerContainer.getChildCount()-1)*-mUiCtxt.dpToPx(40.0f));
+            centerCardCollection.add((String)v.getTag());
+            v.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
         }
         sendMessage(MessageGenerator.getCurrentDeck(gameUBID, gameState));
         // if(role == Role.ADMIN)
@@ -447,7 +506,7 @@ public class GameActivity extends BluetoothActivity {
         }
     }
 
-    private void giveCards(Button btn) {
+    private void giveCards(View btn) {
         if (gameStarted) {
             return;
         }
@@ -458,7 +517,8 @@ public class GameActivity extends BluetoothActivity {
         collectionPlayers.put(btn, val);
         int tag = ((Integer) btn.getTag()).intValue();
         String text = selectedPlayerList.get(tag) + " (" + val + ")";
-        btn.setText(text);
+        TextView tv = (TextView) btn.findViewById(R.id.text_playername);
+        tv.setText(text);
     }
 
     private void initializeCardImages() {
@@ -487,6 +547,7 @@ public class GameActivity extends BluetoothActivity {
     }
 
     private void selectCard(ImageView v) {
+
         String cardName = (String) v.getTag();
         String split[] = cardName.split("_");
         if(selectedCardValue.contains(split[0]) && selectedCardColor.contains(split[split.length-1])){

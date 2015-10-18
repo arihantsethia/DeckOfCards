@@ -5,9 +5,19 @@
     android:background="@color/black"
     tools:context="deck.of.cards.MainActivity" >
 
+
+    <Button
+        android:id="@+id/btn_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:text="Score"/>
+
     <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal">
 
         <LinearLayout
             android:id="@+id/player_panel"
@@ -42,6 +52,13 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <Button
+        android:id="@+id/btn_endGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="End game"/>
+
     <FrameLayout
         android:id="@+id/hand_container"
         android:layout_width="wrap_content"
@@ -56,13 +73,20 @@
         android:orientation="horizontal"
         android:layout_centerInParent="true"/>
 
-    <Button
+   <!-- <Button
         android:id="@+id/btn_unused"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"
-        android:text="Unused cards"/>
+        android:text="Unused cards"/>-->
+
+    <FrameLayout
+        android:id="@+id/unused_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentRight="true"/>
 
 
 
@@ -112,25 +136,34 @@
                 android:layout_height="wrap_content"
                 android:text="Start Game" />
 
+            <CheckBox
+                android:id="@+id/showCardCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show Card"
+                android:textColor="@color/black"
+                android:background="@color/white"
+                android:textSize="10sp"/>
+
             <Button
                 android:id="@+id/place_card"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Place Card"
+                android:text="Place"
                 android:visibility="gone" />
 
             <Button
                 android:id="@+id/from_table_to_deck"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Table To Deck"
+                android:text="To Deck"
                 android:visibility="gone" />
 
             <Button
                 android:id="@+id/from_table_to_hand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Table To Hand"
+                android:text="To Hand"
                 android:visibility="gone" />
 
             <Button

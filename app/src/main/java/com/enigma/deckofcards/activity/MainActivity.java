@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.enigma.deckofcards.Constant;
@@ -59,6 +60,12 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @InjectView(R.id.list_players)
     LinearListLayout playerListView;
+
+    @InjectView(R.id.game_name)
+    EditText gameName;
+
+    @InjectView(R.id.player_name)
+    EditText playerName;
 
     ArrayList<Player> players;
     Player admin;
@@ -146,6 +153,9 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @OnClick(R.id.btn_admin)
     public void onAdminModeClick() {
+        if(gameName.getText().toString().isEmpty() || playerName.getText().toString().isEmpty())
+            return;
+
         if (adminPanelExpanded) {
             animateCollapseAdminPanel();
         } else {
@@ -175,6 +185,8 @@ public class MainActivity extends BluetoothActivity implements PlayerListSelecti
 
     @OnClick(R.id.btn_player)
     public void onPlayerModeClick() {
+        if(gameName.getText().toString().isEmpty() || playerName.getText().toString().isEmpty())
+            return;
         role = Role.PLAYER;
         updateBluetoothAdapterName("DeckOfCards", "Player", role);
         setTimeDiscoverable(BluetoothManager.BLUETOOTH_TIME_DICOVERY_600_SEC);

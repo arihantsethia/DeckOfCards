@@ -13,6 +13,7 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
+            android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +24,16 @@
         <activity
             android:name=".activity.GameActivity"
             android:label="Game"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".activity.EndGameActivity"
+            android:label="End Game"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".activity.ScoreUpdateActivity"
+            android:label="Score Update"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape"></activity>
     </application>

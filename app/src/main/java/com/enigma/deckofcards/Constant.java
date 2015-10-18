@@ -127,6 +127,8 @@ public class Constant {
             put("JACK_OF_DIAMONDS", R.drawable.jack_of_diamonds);
             put("QUEEN_OF_DIAMONDS", R.drawable.queen_of_diamonds);
             put("KING_OF_DIAMONDS", R.drawable.king_of_diamonds);
+
+            put("CARD_BACK_FACE", R.drawable.card_back_face);
         }
     };
 
